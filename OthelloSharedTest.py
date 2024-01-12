@@ -270,7 +270,8 @@ class Bot:
             move_to_check = board.is_legal_move(tile_index.x_pos, tile_index.y_pos, game.active_player)
             if move_to_check:
                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-            return valid_moves
+                print(valid_moves)
+            #return valid_moves
 
         print(board) # affiche mes cases de tableau
                 
