@@ -261,20 +261,18 @@ class Bot:
 
     # BOT FUNCTIONS
 
-    def check_valid_moves(self, board, game):
-       
-        print("Il faut récupérer toutes les cases du tableau")
-        print("Vérifier quels coups sont jouables")
-        print("Et renvoyer les coordonnées")
+    def check_valid_moves(self, Board, Game):
+
         valid_moves = []
-        for tile_index in board.board:
-            move_to_check = board.is_legal_move(tile_index.x_pos, tile_index.y_pos, game.active_player)
+        for tile_index in Board.board:
+            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
             if move_to_check:
                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-                print(valid_moves)
-            return valid_moves
+                if valid_moves:
+                     return random.choice(valid_moves)
+                else:
+                    return None
 
-                
 
 # Create a new board & a new game instances
 othello_board = Board(8)
