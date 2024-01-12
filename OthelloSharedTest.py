@@ -259,19 +259,46 @@ class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
 
-    # BOT FUNCTIONS
+class Bot:
+    def __init__(self):
+        self.name = "Xx_Bender_Destroyer_3.0_xX"
 
-    def check_valid_moves(self, Board, Game):
+    def evaluate_move(self, move, board, player):
+        # Simulate the move and get the updated board
+        temp_board = Board(board.size)
+        temp_board.board = [Tile(tile.x_pos, tile.y_pos, tile.type, tile.content) for tile in board.board]
+        temp_board.place_initial_pawns()  # Place initial pawns
 
+        x, y = move
+        # Simulate the move by placing the pawn on the game board
+        othello_game.place_pawn(x, y, temp_board, player)  # Use the Game class method
+
+        # Evaluate the move based on the difference in the number of pawns
+        current_player_pawns = sum(tile.content == player for tile in temp_board.board)
+        opponent_pawns = sum(tile.content != player and tile.content != "🟩" for tile in temp_board.board)
+        score = current_player_pawns - opponent_pawns
+
+        return score
+
+    def choose_best_move(self, board, player):
         valid_moves = []
-        for tile_index in Board.board:
-            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+        for tile_index in board.board:
+            move_to_check = othello_game.place_pawn(tile_index.x_pos, tile_index.y_pos, board, player)
             if move_to_check:
                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-                if valid_moves:
-                     return random.choice(valid_moves)
-                else:
-                    return None
+
+        if valid_moves:
+            # Choose the move with the highest score
+            best_move = max(valid_moves, key=lambda move: self.evaluate_move(move, board, player))
+            return best_move
+        else:
+            return None
+
+    def check_valid_moves(self, board, game):
+        # Choose the best move using the evaluation function
+        best_move = self.choose_best_move(board, game.active_player)
+
+        return best_move
 
 
 # Create a new board & a new game instances
