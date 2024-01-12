@@ -1,4 +1,5 @@
 import random
+import csv
 
 # Object used to create new boards
 
@@ -254,31 +255,63 @@ class Game:
         else:
             print("Égalité !")
 
-
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
 
-    # BOT FUNCTIONS
+        # Initialise le fichier CSV pour stocker les données
+        with open('othello_data.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['etat_jeu', 'action_jouee', 'recompense', 'resultat'])
 
-    def check_valid_moves(self, board, game):
-       
-        print("Il faut récupérer toutes les cases du tableau")
+        self.othello_board = None
+        self.othello_game = None
 
+    # Fonction pour collecter et stocker les données
+    def collect_and_store_data(self, x_pos, y_pos, result):
+        # Récupère toutes les cases du tableau
         valid_moves = []
-        for tile_index in board.board:
-            move_to_check = board.is_legal_move(tile_index.x_pos, tile_index.y_pos, game.active_player)
+        for tile_index in self.othello_board.board:
+            move_to_check = self.othello_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, self.othello_game.active_player)
             if move_to_check:
                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-            return valid_moves
 
-        print(board) # affiche mes cases de tableau
-                
-        print("Vérifier quels coups sont jouables")
+        # Vérifie quels coups sont jouables et renvoie les coordonnées
+        # Ici, pour simplifier, on prend un coup au hasard parmi les coups valides
+        move_coordinates = random.choice(valid_moves)
+
+        # Après avoir collecté les données, stocke-les dans le fichier CSV
+        with open('othello_data.csv', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            # Modifie cette ligne en fonction des données que tu souhaites stocker
+            writer.writerow([str(self.othello_board.board), move_coordinates, 1, result])
+
+    # Fonction pour simuler des parties contre un bot fort
+    def simulate_games_against_strong_bot(self, num_games):
+        for game_num in range(num_games):
+            print(f"Simulation de la partie {game_num + 1} en cours...")
+
+            # Boucle jusqu'à la fin de chaque partie
+            while not self.othello_game.is_game_over:
+                # Bot principal joue
+                if self.othello_game.active_player == "⚫":
+                    self.collect_and_store_data(1, 1, "en_cours")
+                    # Ajoute ici la logique pour que ton bot principal fasse un mouvement aléatoire parmi les cases possiblement jouables
+                    valid_moves = self.get_valid_moves()
+
+                    if valid_moves:
+                        move_coordinates = random.choice(valid_moves)
+                        self.othello_game.place_pawn(
+                            move_coordinates[0], move_coordinates[1], self.othello_board, self.othello_game.active_player)
+                        self.othello_board.draw_board("Content")  # Dessine le plateau après chaque coup
+
+                # Bot adverse joue
+                else:
+                    # Ajoute ici la logique pour que le bot adverse fasse un mouvement
+                    move_coordinates = [random.randint(0, 7), random.randint(0, 7)]
+                    otherBot.othello_game.place_pawn(move_coordinates[0], move_coordinates[1], otherBot.othello_board, otherBot.othello_game.active_player)
 
 
-
-        print("Et renvoyer les coordonnées")
 
 # Create a new board & a new game instances
 othello_board = Board(8)
@@ -290,25 +323,41 @@ othello_board.create_board()
 # Draw the board
 othello_board.draw_board("Content")
 
+
 # Create 2 bots
 myBot = Bot()
 otherBot = Bot()
 
-# Loop until the game is over
 
 
-while not othello_game.is_game_over:
-    # First player / bot logic goes here
-    if (othello_game.active_player == "⚫"):
-        move_coordinates = [0, 0]
-        move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
-        othello_game.place_pawn(
-            move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
-    # Second player / bot logic goes here
+# Initialise l'instance pour la simulation de parties
+myBot.othello_board = othello_board
+myBot.othello_game = othello_game
+
+# Simule 5 parties contre un bot fort (ou ajuste le nombre selon tes besoins)
+myBot.simulate_games_against_strong_bot(5)
+
+
+while not myBot.othello_game.is_game_over:
+    # Bot logic goes here
+    if myBot.othello_game.active_player == "⚫":
+        myBot.collect_and_store_data(1, 1, "en_cours")
+
+        # Ajoute ici la logique pour obtenir les mouvements valides
+        valid_moves = myBot.get_valid_moves()
+
+        if valid_moves:
+            move_coordinates = random.choice(valid_moves)
+            myBot.othello_game.place_pawn(
+                move_coordinates[0], move_coordinates[1], myBot.othello_board, myBot.othello_game.active_player)
+            myBot.othello_board.draw_board("Content")  # Dessine le plateau après chaque coup
+
     else:
         move_coordinates = [0, 0]
         move_coordinates[0] = int(input("Coordonnées en X: "))
         move_coordinates[1] = int(input("Coordonnées en Y: "))
-        othello_game.place_pawn(
-            move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
+        myBot.othello_game.place_pawn(
+            move_coordinates[0], move_coordinates[1], myBot.othello_board, myBot.othello_game.active_player)
+        myBot.othello_board.draw_board("Content")  # Dessine le plateau après chaque coup
+
