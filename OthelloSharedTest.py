@@ -259,48 +259,58 @@ class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
 
-class Bot:
-    def __init__(self):
-        self.name = "Xx_Bender_Destroyer_3.0_xX"
+    # BOT FUNCTIONS
 
-    def evaluate_move(self, move, board, player):
-        # Simulate the move and get the updated board
-        temp_board = Board(board.size)
-        temp_board.board = [Tile(tile.x_pos, tile.y_pos, tile.type, tile.content) for tile in board.board]
-        temp_board.place_initial_pawns()  # Place initial pawns
+    def check_valid_moves(self, Board, Game):
 
-        x, y = move
-        # Simulate the move by placing the pawn on the game board
-        othello_game.place_pawn(x, y, temp_board, player)  # Use the Game class method
-
-        # Evaluate the move based on the difference in the number of pawns
-        current_player_pawns = sum(tile.content == player for tile in temp_board.board)
-        opponent_pawns = sum(tile.content != player and tile.content != "🟩" for tile in temp_board.board)
-        score = current_player_pawns - opponent_pawns
-
-        return score
-
-    def choose_best_move(self, board, player):
+        number_of_flip = 0
+        biggest_number_of_flip = 0
         valid_moves = []
-        for tile_index in board.board:
-            move_to_check = othello_game.place_pawn(tile_index.x_pos, tile_index.y_pos, board, player)
+        best_coordinates = []
+        best_coordinates_on_border = []
+        check_valid = []
+
+        for tile_index in Board.board:
+            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
             if move_to_check:
-                valid_moves.append([tile_index.x_pos, tile_index.y_pos])
+                check_valid.append(move_to_check)
+                print(check_valid)
+                for move_to_check_index in range(len(move_to_check)):
+                    number_of_flip = 0
+                    number_of_flip += move_to_check[move_to_check_index][0]
+                    
+                    if number_of_flip > biggest_number_of_flip:
+                        biggest_number_of_flip = number_of_flip
+                        best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                        print(best_coordinates)
+                    elif number_of_flip == biggest_number_of_flip:
+                        best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
+                        
+                
+                
+                
+        print(biggest_number_of_flip)
+        print(best_coordinates)
+        
+                        
+                        
+        if len(best_coordinates) > 1:
 
-        if valid_moves:
-            # Choose the move with the highest score
-            best_move = max(valid_moves, key=lambda move: self.evaluate_move(move, board, player))
-            return best_move
-        else:
-            return None
-
-    def check_valid_moves(self, board, game):
-        # Choose the best move using the evaluation function
-        best_move = self.choose_best_move(board, game.active_player)
-
-        return best_move
-
-
+            for coordinates in best_coordinates:
+                print(coordinates)
+                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(Board.board) - 1) or coordinates[1] == (len(Board.board) - 1):
+                    best_coordinates_on_border = (coordinates[0],coordinates[1])
+                    print("J'ai un coup en border")
+                    return best_coordinates_on_border
+            return random.choice(best_coordinates)
+        
+        best_coordinates = (best_coordinates[0])
+        return best_coordinates          
+     
+        
+        
+        
+        
 # Create a new board & a new game instances
 othello_board = Board(8)
 othello_game = Game()
@@ -323,13 +333,11 @@ while not othello_game.is_game_over:
     if (othello_game.active_player == "⚫"):
         move_coordinates = [0, 0]
         move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
-        othello_game.place_pawn(
-            move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
+        othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
     # Second player / bot logic goes here
     else:
         move_coordinates = [0, 0]
         move_coordinates[0] = int(input("Coordonnées en X: "))
         move_coordinates[1] = int(input("Coordonnées en Y: "))
-        othello_game.place_pawn(
-            move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
+        othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
