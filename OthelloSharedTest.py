@@ -310,8 +310,6 @@ class Bot:
      
         
         
-        
-        
 # Create a new board & a new game instances
 othello_board = Board(8)
 othello_game = Game()
