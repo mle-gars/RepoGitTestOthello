@@ -288,12 +288,9 @@ class Bot:
                         
                 
                 
-               
-                
         print(biggest_number_of_flip)
         print(best_coordinates)
         
-                        
                         
         if len(best_coordinates) > 1:
 
@@ -308,8 +305,6 @@ class Bot:
         best_coordinates = (best_coordinates[0])
         return best_coordinates          
      
-        
-        
         
         
 # Create a new board & a new game instances
