@@ -276,18 +276,6 @@ class Bot:
 
     def check_valid_moves(self, Board, Game):
 
-<<<<<<< HEAD
-        valid_moves = []
-        for tile_index in Board.board:
-            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
-            if move_to_check:
-                valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-                if valid_moves:
-                     return random.choice(valid_moves)
-                else:
-                    return None
-
-=======
         number_of_flip = 0
         biggest_number_of_flip = 0
         valid_moves = []
@@ -320,7 +308,6 @@ class Bot:
                         
                         
         if len(best_coordinates) > 1:
->>>>>>> origin/jb
 
             for coordinates in best_coordinates:
                 print(coordinates)
@@ -359,24 +346,14 @@ while not othello_game.is_game_over:
     if (othello_game.active_player == "⚫"):
         move_coordinates = [0, 0]
         move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
-<<<<<<< HEAD
-        othello_game.place_pawn(
-            move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
-=======
         othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
->>>>>>> origin/jb
 
     # Second player / bot logic goes here
     else:
         move_coordinates = [0, 0]
         move_coordinates[0] = int(input("Coordonnées en X: "))
         move_coordinates[1] = int(input("Coordonnées en Y: "))
-<<<<<<< HEAD
-        othello_game.place_pawn(
-            move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
-=======
         othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
         
         
         
->>>>>>> origin/jb
