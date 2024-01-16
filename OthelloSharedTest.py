@@ -1,5 +1,4 @@
 import random
-import csv
 
 # Object used to create new boards
 
@@ -52,19 +51,6 @@ class Board:
         self.board[28].content = "⚫"
         self.board[35].content = "⚫"
         self.board[36].content = "⚪"
-        
-        # self.board[11].content = "⚫"
-        # self.board[9].content = "⚪"
-        # self.board[10].content = "⚪"
-        # self.board[11].content = "⚪"
-        
-        # self.board[12].content = "⚫"
-        # self.board[19].content = "⚪"
-        # self.board[20].content = "⚪"
-        # self.board[28].content = "⚪"
-        # self.board[36].content = "⚪"
-        # self.board[26].content = "⚫"
-        
 
     # Check if the position in inside the board
     # Return true or false depending if it is inside or not
@@ -268,6 +254,7 @@ class Game:
         else:
             print("Égalité !")
 
+
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
@@ -281,36 +268,35 @@ class Bot:
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
-        check_valid = []
+        # check_valid = []
 
         for tile_index in Board.board:
             move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
             if move_to_check:
-                check_valid.append(move_to_check)
-                print(check_valid)
+                # check_valid.append(move_to_check)
+                # print(check_valid)
+                number_of_flip = 0
                 for move_to_check_index in range(len(move_to_check)):
-                    number_of_flip = 0
                     number_of_flip += move_to_check[move_to_check_index][0]
                     
                     if number_of_flip > biggest_number_of_flip:
                         biggest_number_of_flip = number_of_flip
-                        best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                        best_coordinates = [[tile_index.x_pos, tile_index.y_pos]]
                         print(best_coordinates)
                     elif number_of_flip == biggest_number_of_flip:
-                        best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
+                        best_coordinates.append([tile_index.x_pos, tile_index.y_pos])
+                        print(best_coordinates)
                         
                 
                 
-                
-        print(biggest_number_of_flip)
-        print(best_coordinates)
+        # print(biggest_number_of_flip)
+        # print(best_coordinates)
         
-                        
                         
         if len(best_coordinates) > 1:
 
             for coordinates in best_coordinates:
-                print(coordinates)
+                # print(coordinates)
                 if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(Board.board) - 1) or coordinates[1] == (len(Board.board) - 1):
                     best_coordinates_on_border = (coordinates[0],coordinates[1])
                     print("J'ai un coup en border")
@@ -320,8 +306,6 @@ class Bot:
         best_coordinates = (best_coordinates[0])
         return best_coordinates          
      
-        
-        
         
         
 # Create a new board & a new game instances
@@ -350,10 +334,5 @@ while not othello_game.is_game_over:
 
     # Second player / bot logic goes here
     else:
-        move_coordinates = [0, 0]
-        move_coordinates[0] = int(input("Coordonnées en X: "))
-        move_coordinates[1] = int(input("Coordonnées en Y: "))
+        move_coordinates =  myBot.check_valid_moves(othello_board, othello_game)
         othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
-        
-        
-        
