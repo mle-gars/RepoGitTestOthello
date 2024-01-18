@@ -295,7 +295,6 @@ class Bot:
                         -10,-20,1,2,2,1,-20,-10,
                         100,-10,11,6,6,11,-10,100]
         
-        print(bonus_matrix[0])
         for tile in range(len(new_board.board)):
             new_board.weight = bonus_matrix[tile]
         
@@ -342,8 +341,25 @@ class Bot:
         best_coordinates = (best_coordinates[0])
         return best_coordinates
     
-     
-    
+class OtherBot:
+    def __init__(self):
+        self.name = "Xx_Bender_Destroyer_1.0_xX"
+
+    # BOT FUNCTIONS
+
+    def check_valid_moves(self, Board, Game):
+
+        valid_moves = []
+        for tile_index in Board.board:
+            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+            if move_to_check:
+                valid_moves.append([tile_index.x_pos, tile_index.y_pos])
+                if valid_moves:
+                     return random.choice(valid_moves)
+                else:
+                    return None     
+
+
 def play_games(number_of_games):
     white_victories = 0
     black_victories = 0
@@ -361,7 +377,7 @@ def play_games(number_of_games):
 
         # Create 2 bots
         myBot = Bot()
-        otherBot = Bot()
+        otherBot = OtherBot()
 
         # Loop until the game is over
 
@@ -374,7 +390,7 @@ def play_games(number_of_games):
 
             # Second player / bot logic goes here
             else:
-                move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
+                move_coordinates = otherBot.check_valid_moves(othello_board, othello_game)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
     
         if(othello_game.winner == "⚫"):
