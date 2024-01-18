@@ -1,5 +1,6 @@
 import random
 import csv
+import copy
 
 # Object used to create new boards
 
@@ -58,12 +59,13 @@ class Board:
         # self.board[10].content = "⚪"
         # self.board[11].content = "⚪"
         
-        # self.board[12].content = "⚫"
+        # self.board[10].content = "⚫"
+        # self.board[18].content = "⚪"
         # self.board[19].content = "⚪"
-        # self.board[20].content = "⚪"
-        # self.board[28].content = "⚪"
+        # self.board[26].content = "⚪"
+        # self.board[35].content = "⚪"
         # self.board[36].content = "⚪"
-        # self.board[26].content = "⚫"
+        # self.board[37].content = "⚫"
         
 
     # Check if the position in inside the board
@@ -274,56 +276,84 @@ class Bot:
 
     # BOT FUNCTIONS
 
-    def check_valid_moves(self, Board, Game):
-
+    def check_valid_moves(self, base_board, Game):
+        
         number_of_flip = 0
         biggest_number_of_flip = 0
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
         check_valid = []
+        new_board = Board(8)
+        new_board.create_board()
+        self.ponderation(new_board)
 
-        for tile_index in Board.board:
-            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
             if move_to_check:
                 check_valid.append(move_to_check)
                 print(check_valid)
+                
+                number_of_flip = 0
+                
                 for move_to_check_index in range(len(move_to_check)):
-                    number_of_flip = 0
-                    number_of_flip += move_to_check[move_to_check_index][0]
+                    # print("score")
+                    # print(move_to_check[move_to_check_index][0])
+                    number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
+                
+
+                
+                number_of_flip += new_board.board.weight
+                print("cumule")
+                print(number_of_flip)
                     
-                    if number_of_flip > biggest_number_of_flip:
-                        biggest_number_of_flip = number_of_flip
-                        best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                        print(best_coordinates)
-                    elif number_of_flip == biggest_number_of_flip:
-                        best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
-                        
-                
-                
-                
+                    
+                if number_of_flip > biggest_number_of_flip:
+                    biggest_number_of_flip = number_of_flip
+                    best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                        # print(best_coordinates)
+                elif number_of_flip == biggest_number_of_flip:
+                    best_coordinates.append((tile_index.x_pos, tile_index.y_pos)) 
         print(biggest_number_of_flip)
         print(best_coordinates)
-        
-                        
-                        
+                      
         if len(best_coordinates) > 1:
 
             for coordinates in best_coordinates:
                 print(coordinates)
-                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(Board.board) - 1) or coordinates[1] == (len(Board.board) - 1):
+                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
                     best_coordinates_on_border = (coordinates[0],coordinates[1])
                     print("J'ai un coup en border")
                     return best_coordinates_on_border
             return random.choice(best_coordinates)
         
         best_coordinates = (best_coordinates[0])
-        return best_coordinates          
-     
+        return best_coordinates
+    
+    
+    
+
+    def ponderation(self, new_board):
+
+        bonus_matrix = [100,-10,11,6,6,11, -10,100,
+                        -10,-20,1,2,2,1, -20,-10,
+                        10,1,5,4,4,5,1,10,
+                        6,2,4,2,2,4,2,6,
+                        6,2,4,2,2,4,2,6,
+                        10,1,5,4,4,5,1,10,
+                        -10,-20,1,2,2,1,-20,-10,
+                        100,-10,11,6,6,11,-10,100]
+        
+        for new_board_index in range(len(new_board.board)):
+            new_board.board[new_board_index].weight = bonus_matrix[new_board_index]
+        print(bonus_matrix[new_board_index])
         
         
-        
-        
+    
+    
+    
+
+   
 # Create a new board & a new game instances
 othello_board = Board(8)
 othello_game = Game()
@@ -344,7 +374,6 @@ otherBot = Bot()
 while not othello_game.is_game_over:
     # First player / bot logic goes here
     if (othello_game.active_player == "⚫"):
-        move_coordinates = [0, 0]
         move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
         othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
