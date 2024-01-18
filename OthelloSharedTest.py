@@ -280,7 +280,7 @@ class Bot:
         
         cpt_tile = 0
         number_of_flip = 0
-        biggest_number_of_flip = -100
+        biggest_number_of_flip = -21
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
@@ -362,17 +362,49 @@ class OtherBot:
 
     # BOT FUNCTIONS
 
-    def check_valid_moves(self, Board, Game):
+    def check_valid_moves(self, base_board, base_game):
 
+        number_of_flip = 0
+        biggest_number_of_flip = 0
         valid_moves = []
-        for tile_index in Board.board:
-            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+        best_coordinates = []
+        best_coordinates_on_border = []
+        check_valid = []
+
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
-                valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-                if valid_moves:
-                     return random.choice(valid_moves)
-                else:
-                    return None     
+                check_valid.append(move_to_check)
+                # print(check_valid)
+                for move_to_check_index in range(len(move_to_check)):
+                    number_of_flip = 0
+                    number_of_flip += move_to_check[move_to_check_index][0]
+                    
+                    if number_of_flip > biggest_number_of_flip:
+                        biggest_number_of_flip = number_of_flip
+                        best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                        # print(best_coordinates)
+                    elif number_of_flip == biggest_number_of_flip:
+                        best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
+                        
+                
+                
+        # print(biggest_number_of_flip)
+        # print(best_coordinates)
+        
+                        
+        if len(best_coordinates) > 1:
+
+            for coordinates in best_coordinates:
+                # print(coordinates)
+                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
+                    best_coordinates_on_border = (coordinates[0],coordinates[1])
+                    # print("J'ai un coup en border")
+                    return best_coordinates_on_border
+            return random.choice(best_coordinates)
+        
+        best_coordinates = (best_coordinates[0])
+        return best_coordinates          
 
 
 def play_games(number_of_games):
@@ -419,7 +451,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(100)
-        
-        
-        
+play_games(300)
