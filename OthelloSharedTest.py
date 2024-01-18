@@ -278,8 +278,9 @@ class Bot:
 
     def check_valid_moves(self, base_board, base_game):
         
+        cpt_tile = 0
         number_of_flip = 0
-        biggest_number_of_flip = 0
+        biggest_number_of_flip = -100
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
@@ -296,14 +297,15 @@ class Bot:
                         100,-10,11,6,6,11,-10,100]
         
         for tile in range(len(new_board.board)):
-            new_board.weight = bonus_matrix[tile]
+            new_board.board[tile].weight = bonus_matrix[tile]
+            
         
 
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 check_valid.append(move_to_check)
-                print(check_valid)
+                # print(check_valid)
                 
                 number_of_flip = 0
                 
@@ -312,34 +314,47 @@ class Bot:
                     # print(move_to_check[move_to_check_index][0])
                     number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
 
+                # print(new_board.board[cpt_tile].weight)
+                number_of_flip += new_board.board[cpt_tile].weight
                 
-                number_of_flip += new_board.weight
-                
-                print("cumule")
-                print(number_of_flip)
+                # print("cumule")
+                # print(number_of_flip)
+                # print(biggest_number_of_flip)
                     
                     
-                if number_of_flip > biggest_number_of_flip:
+                if number_of_flip >= biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
                     best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                        # print(best_coordinates)
-                elif number_of_flip == biggest_number_of_flip:
-                    best_coordinates.append((tile_index.x_pos, tile_index.y_pos)) 
-        print(biggest_number_of_flip)
-        print(best_coordinates)
-                      
-        if len(best_coordinates) > 1:
-
-            for coordinates in best_coordinates:
-                print(coordinates)
-                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
-                    best_coordinates_on_border = (coordinates[0],coordinates[1])
-                    print("J'ai un coup en border")
-                    return best_coordinates_on_border
-            return random.choice(best_coordinates)
-        
-        best_coordinates = (best_coordinates[0])
+                # elif number_of_flip == biggest_number_of_flip:
+                #     best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
+        # print(biggest_number_of_flip)
+        # print(best_coordinates)
+                # print(best_coordinates)
+         
+            cpt_tile += 1 
+            
+            
+            
+        best_coordinates = best_coordinates[0]
+            
         return best_coordinates
+            
+                         
+        # if len(best_coordinates) > 1:
+
+        #     for coordinates in best_coordinates:
+        #         # print(coordinates)
+        #         if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
+        #             best_coordinates_on_border = (coordinates[0],coordinates[1])
+        #             print("J'ai un coup en border")
+        #             return best_coordinates_on_border
+        #     print("1")
+        #     print(best_coordinates)
+        #     return random.choice(best_coordinates)
+        # print("2")
+        # print(best_coordinates)
+        # best_coordinates = (best_coordinates[0])
+        # return best_coordinates
     
 class OtherBot:
     def __init__(self):
