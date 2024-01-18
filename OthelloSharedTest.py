@@ -276,7 +276,7 @@ class Bot:
 
     # BOT FUNCTIONS
 
-    def check_valid_moves(self, base_board, Game):
+    def check_valid_moves(self, base_board, base_game):
         
         number_of_flip = 0
         biggest_number_of_flip = 0
@@ -286,10 +286,22 @@ class Bot:
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
-        self.ponderation(new_board)
+        bonus_matrix = [100,-10,11,6,6,11, -10,100,
+                        -10,-20,1,2,2,1, -20,-10,
+                        10,1,5,4,4,5,1,10,
+                        6,2,4,2,2,4,2,6,
+                        6,2,4,2,2,4,2,6,
+                        10,1,5,4,4,5,1,10,
+                        -10,-20,1,2,2,1,-20,-10,
+                        100,-10,11,6,6,11,-10,100]
+        
+        print(bonus_matrix[0])
+        for tile in range(len(new_board.board)):
+            new_board.weight = bonus_matrix[tile]
+        
 
         for tile_index in base_board.board:
-            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 check_valid.append(move_to_check)
                 print(check_valid)
@@ -301,9 +313,10 @@ class Bot:
                     # print(move_to_check[move_to_check_index][0])
                     number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
                 
-
+                print(new_board.board[(10)])
                 
-                number_of_flip += new_board.board.weight
+                number_of_flip += new_board.weight
+                
                 print("cumule")
                 print(number_of_flip)
                     
@@ -329,25 +342,10 @@ class Bot:
         
         best_coordinates = (best_coordinates[0])
         return best_coordinates
-    
+        
     
     
 
-    def ponderation(self, new_board):
-
-        bonus_matrix = [100,-10,11,6,6,11, -10,100,
-                        -10,-20,1,2,2,1, -20,-10,
-                        10,1,5,4,4,5,1,10,
-                        6,2,4,2,2,4,2,6,
-                        6,2,4,2,2,4,2,6,
-                        10,1,5,4,4,5,1,10,
-                        -10,-20,1,2,2,1,-20,-10,
-                        100,-10,11,6,6,11,-10,100]
-        
-        for new_board_index in range(len(new_board.board)):
-            new_board.board[new_board_index].weight = bonus_matrix[new_board_index]
-        print(bonus_matrix[new_board_index])
-        
         
     
     
