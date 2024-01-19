@@ -281,9 +281,7 @@ class Bot:
         cpt_tile = 0
         number_of_flip = 0
         biggest_number_of_flip = -21
-        valid_moves = []
         best_coordinates = []
-        best_coordinates_on_border = []
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
@@ -382,12 +380,40 @@ class Bot:
             return best_score
             
     def evaluate_position(self, base_board, base_game):
-        # Fonction d'évaluation de la position (à ajuster selon votre logique)
-        # Plus le score est élevé, meilleure est la position pour le joueur actif
-        # Cette fonction pourrait utiliser différentes heuristiques pour évaluer la position
-        # Retournez un score en fonction de la position actuelle
-        return 0  # À remplacer par votre propre logique d'évaluation
+        corner_bonus = 20
+        edge_bonus = 5
+        near_edge_penalty = -5
+        mobility_bonus = 2
+        score = base_game.score_black - base_game.score_white
 
+        for corner in [(0, 0), (0, 7), (7, 0), (7, 7)]:
+            if base_board.board[corner[0] + corner[1] * 8].content == "⚫":
+                score += corner_bonus
+            elif base_board.board[corner[0] + corner[1] * 8].content == "⚪":
+                score -= corner_bonus
+
+        # Bonus pour les bords
+        for edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
+            if base_board.board[edge[0] + edge[1] * 8].content == "⚫":
+                score += edge_bonus
+            elif base_board.board[edge[0] + edge[1] * 8].content == "⚪":
+                score -= edge_bonus
+
+        # Malus pour les cases adjacentes aux bords
+        for near_edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
+            if base_board.board[near_edge[0] + near_edge[1] * 8].content == "🟩":
+                score += near_edge_penalty
+
+        # Bonus pour la mobilité
+        valid_moves = 0
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
+            if move_to_check:
+                valid_moves += 1
+
+        score += mobility_bonus * valid_moves
+
+        return score
                          
         # if len(best_coordinates) > 1:
 
@@ -408,7 +434,6 @@ class Bot:
 class OtherBot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_1.0_xX"
-        self.rl_agent = ReinforcementLearningOthelloAgent()
         self.max_planning_depth = 3
 
     # BOT FUNCTIONS
@@ -419,9 +444,7 @@ class OtherBot:
         cpt_tile = 0
         number_of_flip = 0
         biggest_number_of_flip = -21
-        valid_moves = []
         best_coordinates = []
-        best_coordinates_on_border = []
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
@@ -520,11 +543,40 @@ class OtherBot:
             return best_score
             
     def evaluate_position(self, base_board, base_game):
-        # Fonction d'évaluation de la position (à ajuster selon votre logique)
-        # Plus le score est élevé, meilleure est la position pour le joueur actif
-        # Cette fonction pourrait utiliser différentes heuristiques pour évaluer la position
-        # Retournez un score en fonction de la position actuelle
-        return 0  # À remplacer par votre propre logique d'évaluation
+        corner_bonus = 20
+        edge_bonus = 5
+        near_edge_penalty = -5
+        mobility_bonus = 2
+        score = base_game.score_black - base_game.score_white
+
+        for corner in [(0, 0), (0, 7), (7, 0), (7, 7)]:
+            if base_board.board[corner[0] + corner[1] * 8].content == "⚫":
+                score += corner_bonus
+            elif base_board.board[corner[0] + corner[1] * 8].content == "⚪":
+                score -= corner_bonus
+
+        # Bonus pour les bords
+        for edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
+            if base_board.board[edge[0] + edge[1] * 8].content == "⚫":
+                score += edge_bonus
+            elif base_board.board[edge[0] + edge[1] * 8].content == "⚪":
+                score -= edge_bonus
+
+        # Malus pour les cases adjacentes aux bords
+        for near_edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
+            if base_board.board[near_edge[0] + near_edge[1] * 8].content == "🟩":
+                score += near_edge_penalty
+
+        # Bonus pour la mobilité
+        valid_moves = 0
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
+            if move_to_check:
+                valid_moves += 1
+
+        score += mobility_bonus * valid_moves
+
+        return score
 
                 
                 
