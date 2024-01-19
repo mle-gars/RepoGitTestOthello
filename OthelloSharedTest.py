@@ -287,19 +287,37 @@ class Bot:
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
-        bonus_matrix = [100,-10,11,6,6,11, -10,100,
-                        -10,-20,1,2,2,1, -20,-10,
-                        10,1,5,4,4,5,1,10,
-                        6,2,4,2,2,4,2,6,
-                        6,2,4,2,2,4,2,6,
-                        10,1,5,4,4,5,1,10,
-                        -10,-20,1,2,2,1,-20,-10,
-                        100,-10,11,6,6,11,-10,100]
-        
+        current_part = 1
+
+        # Bonus matrices pour les deux parties
+        bonus_matrix_20_plus = [100, 20, 5, 2, 2, 5, 20, 100,
+                                20, 0, 1.5, 1.5, 1.5, 1.5, 0, 20,
+                                5, 1.5, 5, 1, 1, 5, 1.5, 5,
+                                2, 1.5, 1, 0, 0, 1, 1.5, 2,
+                                2, 1.5, 1, 0, 0, 1, 1.5, 2,
+                                5, 1.5, 5, 1, 1, 5, 1.5, 5,
+                                20, 0, 1.5, 1.5, 1.5, 1.5, 0, 20,
+                                100, 20, 5, 2, 2, 5, 20, 100]
+
+        bonus_matrix_20_m = [100, 20, 5, 2, 2, 5, 20, 100,
+                                20, 0, 1.5, 1.5, 1.5, 1.5, 0, 20,
+                                5, 1.5, 120, 100, 100, 120, 1.5, 5,
+                                2, 1.5, 100, 0, 0, 100, 1.5, 2,
+                                2, 1.5, 100, 0, 0, 100, 1.5, 2,
+                                5, 1.5, 120, 100, 100, 120, 1.5, 5,
+                                20, 0, 1.5, 1.5, 1.5, 1.5, 0, 20,
+                                100, 20, 5, 2, 2, 5, 20, 100]
+
+        if current_part <= 16:
+            bonus_matrix = bonus_matrix_20_m
+            
+        else:
+            bonus_matrix = bonus_matrix_20_plus
+            
         for tile in range(len(new_board.board)):
             new_board.board[tile].weight = bonus_matrix[tile]
-            
-        
+                
+        current_part += 2
 
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
