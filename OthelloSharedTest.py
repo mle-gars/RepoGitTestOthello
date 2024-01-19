@@ -1,4 +1,6 @@
 import random
+import json
+import traceback
 
 # Object used to create new boards
 
@@ -258,20 +260,72 @@ class Game:
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
+        self.strategy_file = "bot_strategy.json"
+        self.strategy = self.load_strategy()
 
     # BOT FUNCTIONS
 
-    def check_valid_moves(self, Board, Game):
-
+    def check_valid_moves(self, base_board, base_game):
         valid_moves = []
-        for tile_index in Board.board:
-            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-                if valid_moves:
-                     return random.choice(valid_moves)
-                else:
-                    return None
+
+        if valid_moves:
+            return self.choose_move(valid_moves)
+        else:
+            return None
+
+    def choose_move(self, valid_moves):
+        # Implement a simple machine learning algorithm here (currently a random move)
+        if self.strategy:
+            return self.exploit_strategy(valid_moves)
+        else:
+            return random.choice(valid_moves)
+
+    def exploit_strategy(self, valid_moves):
+        # Use the learned strategy to make a move
+        # For simplicity, this example just picks a random move from the learned strategy
+        return random.choice(list(self.strategy.keys()))
+
+    def train(self, base_board, base_game):
+        # Simulate training by making a random move
+        valid_moves = self.check_valid_moves(base_board, base_game)
+        if valid_moves:
+            move = random.choice(valid_moves)
+            self.update_strategy(move)
+            return move
+        else:
+            return None
+
+    def update_strategy(self, move):
+        # Update the learned strategy based on the outcome of the move
+        # For simplicity, this example updates the strategy randomly
+        self.strategy[tuple(move)] = random.uniform(0, 1)
+        self.save_strategy()
+
+    def save_strategy(self):
+        try:
+            with open(self.strategy_file, 'w') as file:
+                json.dump(self.strategy, file)
+                print("Strategy saved successfully.")
+        except Exception as e:
+            print(f"Error saving strategy: {e}")
+            traceback.print_exc()
+
+    def load_strategy(self):
+        try:
+            with open(self.strategy_file, 'r') as file:
+                strategy = json.load(file)
+                print("Strategy loaded successfully.")
+                return strategy
+        except FileNotFoundError:
+            print(f"Strategy file not found. Creating a new strategy.")
+            return {}
+        except Exception as e:
+            print(f"Error loading strategy: {e}")
+            return {}
 
 class OtherBot:
     def __init__(self):
@@ -279,11 +333,11 @@ class OtherBot:
 
     # BOT FUNCTIONS
 
-    def check_valid_moves(self, Board, Game):
+    def check_valid_moves(self, base_board, base_game):
 
         valid_moves = []
-        for tile_index in Board.board:
-            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
                 if valid_moves:
@@ -335,4 +389,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(100)
+play_games(2)
