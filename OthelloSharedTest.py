@@ -271,98 +271,124 @@ class Game:
             print("Égalité !")
 
 class Bot:
-    def __init__(self, learning_rate=0.4, discount_factor=0.9, exploration_rate=0.01):
+    def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
-        self.q_values = {}  # Q-values for state-action pairs
-        self.learning_rate = learning_rate
-        self.discount_factor = discount_factor
-        self.exploration_rate = exploration_rate
 
     # BOT FUNCTIONS
 
-    def state_key(self, base_board, base_game):
-        key = (tuple(tile.content for tile in base_board.board), base_game.active_player)
-        return key
-
-    def update_q_values(self, state_key, action, reward, next_state_key):
-        q_values = self.q_values.get(state_key, {})
-        next_q_values = self.q_values.get(next_state_key, {})
-
-        current_q = q_values.get(action, 0)
-        max_future_q = max(next_q_values.values(), default=0)
-
-        new_q = current_q + self.learning_rate * (reward + self.discount_factor * max_future_q - current_q)
-        q_values[action] = new_q
-
-        self.q_values[state_key] = q_values
-
-    def choose_action(self, valid_moves, othello_board, othello_game):
-        # Epsilon-greedy strategy for exploration
-        if random.uniform(0, 1) < self.exploration_rate:
-            return random.choice(valid_moves) if valid_moves else None
-        else:
-            # Choose the action with the highest Q-value or a random action if no Q-values are available
-            state_key = self.state_key(othello_board, othello_game)
-            q_values = self.q_values.get(state_key, {})
-
-            if not q_values:
-                # If no Q-values are available, choose a random action
-                return random.choice(valid_moves) if valid_moves else None
-
-            max_action = max(q_values, key=q_values.get, default=random.choice(valid_moves))
-
-            # Ensure the action is always a tuple
-            return max_action if isinstance(max_action, tuple) else (max_action,)
-
-    def learn_and_play(self, othello_board, othello_game):
-        state_key = self.state_key(othello_board, othello_game)
-        valid_moves = self.check_valid_moves(othello_board, othello_game)
-        action = self.choose_action(valid_moves, othello_board, othello_game)
-
-        # Print the action to help debug
-        print("Action:", action)
-
-        # Ensure action is a tuple
-        if not isinstance(action, tuple):
-            action = (action, 0)  # Assuming 0 as the second element, you can modify as needed
-
-        # Store current scores
-        self.last_black_score = othello_game.score_black
-        self.last_white_score = othello_game.score_white
-
-        # Print the action just before calling place_pawn
-        print("Before place_pawn, action:", action)
-        
-
-        othello_game.place_pawn(action[0], action[1], othello_board, othello_game.active_player)
-        reward = self.get_reward(othello_board, othello_game)
-        next_state_key = self.state_key(othello_board, othello_game)
-
-        self.update_q_values(state_key, action, reward, next_state_key)
-
     def check_valid_moves(self, base_board, base_game):
+        
+        cpt_tile = 0
+        number_of_flip = 0
+        biggest_number_of_flip = -21
         valid_moves = []
+        best_coordinates = []
+        best_coordinates_on_border = []
+        check_valid = []
         new_board = Board(8)
         new_board.create_board()
-        bonus_matrix = [100, -10, 11, 6, 6, 11, -10, 100,
-                        -10, -20, 1, 2, 2, 1, -20, -10,
-                        10, 1, 5, 4, 4, 5, 1, 10,
-                        6, 2, 4, 2, 2, 4, 2, 6,
-                        6, 2, 4, 2, 2, 4, 2, 6,
-                        10, 1, 5, 4, 4, 5, 1, 10,
-                        -10, -20, 1, 2, 2, 1, -20, -10,
-                        100, -10, 11, 6, 6, 11, -10, 100]
+        bonus_matrix = [100,-10,11,6,6,11, -10,100,
+                        -10,-20,1,2,2,1, -20,-10,
+                        10,1,5,4,4,5,1,10,
+                        6,2,4,2,2,4,2,6,
+                        6,2,4,2,2,4,2,6,
+                        10,1,5,4,4,5,1,10,
+                        -10,-20,1,2,2,1,-20,-10,
+                        100,-10,11,6,6,11,-10,100]
+        
+        for tile in range(len(new_board.board)):
+            new_board.board[tile].weight = bonus_matrix[tile]
+            
+        
 
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
+                check_valid.append(move_to_check)
+                # print(check_valid)
+                
+                number_of_flip = 0
+                
+                for move_to_check_index in range(len(move_to_check)):
+                    # print("score")
+                    # print(move_to_check[move_to_check_index][0])
+                    number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
+
+                # print(new_board.board[cpt_tile].weight)
+                number_of_flip += new_board.board[cpt_tile].weight
+                
+                # print("cumule")
+                # print(number_of_flip)
+                # print(biggest_number_of_flip)
+                    
+                    
+                if number_of_flip >= biggest_number_of_flip:
+                    biggest_number_of_flip = number_of_flip
+                    best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                # elif number_of_flip == biggest_number_of_flip:
+                #     best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
+        # print(biggest_number_of_flip)
+        # print(best_coordinates)
+                # print(best_coordinates)
+         
+            cpt_tile += 1 
+            
+            
+            
+        best_coordinates = best_coordinates[0]
+            
+        return best_coordinates
+    
+    def recursive_planning(self, base_board, base_game, depth):
+        if depth == 0:
+            # Si nous avons atteint la profondeur souhaitée, évaluez la position actuelle
+            return self.evaluate_position(base_board, base_game)
+        valid_moves = []
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(
+                tile_index.x_pos, tile_index.y_pos, base_game.active_player)
+            if move_to_check:
                 valid_moves.append((tile_index.x_pos, tile_index.y_pos))
 
-        # Update weights of valid moves based on the bonus matrix
-        valid_moves_with_weights = [(move[0], move[1], bonus_matrix[move[0] + move[1] * 8]) for move in valid_moves]
+        best_score = float('-inf') if base_game.active_player == "⚫" else float('inf')
+        best_move = None
 
-        return valid_moves_with_weights
+        for move in valid_moves:
+            # Copiez l'état actuel pour simuler le coup
+            simulated_board = copy.deepcopy(base_board)
+            simulated_game = copy.deepcopy(base_game)
 
+            # Simuler le coup
+            simulated_game.place_pawn(move[0], move[1], simulated_board, simulated_game.active_player)
+
+            # Récursivement appeler la planification pour le prochain niveau
+            score = self.recursive_planning(simulated_board, simulated_game, depth - 1)
+
+            # Mettez à jour le meilleur score et le meilleur mouvement
+            if base_game.active_player == "⚫":
+                if score > best_score:
+                    best_score = score
+                    best_move = move
+            else:
+                if score < best_score:
+                    best_score = score
+                    best_move = move
+
+        if depth == self.max_planning_depth:
+            # Si nous sommes au niveau supérieur, retournez le meilleur coup
+            return best_move
+        else:
+            # Sinon, retournez le score de la position actuelle
+            return best_score
+            
+    def evaluate_position(self, base_board, base_game):
+        # Fonction d'évaluation de la position (à ajuster selon votre logique)
+        # Plus le score est élevé, meilleure est la position pour le joueur actif
+        # Cette fonction pourrait utiliser différentes heuristiques pour évaluer la position
+        # Retournez un score en fonction de la position actuelle
+        return 0  # À remplacer par votre propre logique d'évaluation
+
+                         
         # if len(best_coordinates) > 1:
 
         #     for coordinates in best_coordinates:
@@ -379,73 +405,134 @@ class Bot:
         # best_coordinates = (best_coordinates[0])
         # return best_coordinates
     
-    def get_reward(self, base_board, base_game):
-        # Check if the game is over and provide a reward based on the outcome
-        if base_game.is_game_over:
-            if base_game.winner == self.name:
-                return 10  # High positive reward for winning
-            else:
-                return -10  # High negative reward for losing
-
-        # Calculate the change in scores
-        black_score_change = base_game.score_black - self.last_black_score
-        white_score_change = base_game.score_white - self.last_white_score
-
-        # Provide a reward based on score changes
-        reward = black_score_change - white_score_change
-
-        return reward
-    
 class OtherBot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_1.0_xX"
+        self.rl_agent = ReinforcementLearningOthelloAgent()
+        self.max_planning_depth = 3
 
     # BOT FUNCTIONS
+        
 
     def check_valid_moves(self, base_board, base_game):
-
+        
+        cpt_tile = 0
         number_of_flip = 0
-        biggest_number_of_flip = 0
+        biggest_number_of_flip = -21
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
         check_valid = []
+        new_board = Board(8)
+        new_board.create_board()
+        bonus_matrix = [100,-10,11,6,6,11, -10,100,
+                        -10,-20,1,2,2,1, -20,-10,
+                        10,1,5,4,4,5,1,10,
+                        6,2,4,2,2,4,2,6,
+                        6,2,4,2,2,4,2,6,
+                        10,1,5,4,4,5,1,10,
+                        -10,-20,1,2,2,1,-20,-10,
+                        100,-10,11,6,6,11,-10,100]
+        
+        for tile in range(len(new_board.board)):
+            new_board.board[tile].weight = bonus_matrix[tile]
+            
+        
 
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 check_valid.append(move_to_check)
                 # print(check_valid)
+                
+                number_of_flip = 0
+                
                 for move_to_check_index in range(len(move_to_check)):
-                    number_of_flip = 0
-                    number_of_flip += move_to_check[move_to_check_index][0]
+                    # print("score")
+                    # print(move_to_check[move_to_check_index][0])
+                    number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
+
+                # print(new_board.board[cpt_tile].weight)
+                number_of_flip += new_board.board[cpt_tile].weight
+                
+                # print("cumule")
+                # print(number_of_flip)
+                # print(biggest_number_of_flip)
                     
-                    if number_of_flip > biggest_number_of_flip:
-                        biggest_number_of_flip = number_of_flip
-                        best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                        # print(best_coordinates)
-                    elif number_of_flip == biggest_number_of_flip:
-                        best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
-                        
+                    
+                if number_of_flip >= biggest_number_of_flip:
+                    biggest_number_of_flip = number_of_flip
+                    best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                # elif number_of_flip == biggest_number_of_flip:
+                #     best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
+        # print(biggest_number_of_flip)
+        # print(best_coordinates)
+                # print(best_coordinates)
+         
+            cpt_tile += 1 
+            
+            
+            
+        best_coordinates = best_coordinates[0]
+            
+        return best_coordinates
+    
+    def recursive_planning(self, base_board, base_game, depth):
+        if depth == 0:
+            # Si nous avons atteint la profondeur souhaitée, évaluez la position actuelle
+            return self.evaluate_position(base_board, base_game)
+        valid_moves = []
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(
+                tile_index.x_pos, tile_index.y_pos, base_game.active_player)
+            if move_to_check:
+                valid_moves.append((tile_index.x_pos, tile_index.y_pos))
+
+        best_score = float('-inf') if base_game.active_player == "⚫" else float('inf')
+        best_move = None
+
+        for move in valid_moves:
+            # Copiez l'état actuel pour simuler le coup
+            simulated_board = copy.deepcopy(base_board)
+            simulated_game = copy.deepcopy(base_game)
+
+            # Simuler le coup
+            simulated_game.place_pawn(move[0], move[1], simulated_board, simulated_game.active_player)
+
+            # Récursivement appeler la planification pour le prochain niveau
+            score = self.recursive_planning(simulated_board, simulated_game, depth - 1)
+
+            # Mettez à jour le meilleur score et le meilleur mouvement
+            if base_game.active_player == "⚫":
+                if score > best_score:
+                    best_score = score
+                    best_move = move
+            else:
+                if score < best_score:
+                    best_score = score
+                    best_move = move
+
+        if depth == self.max_planning_depth:
+            # Si nous sommes au niveau supérieur, retournez le meilleur coup
+            return best_move
+        else:
+            # Sinon, retournez le score de la position actuelle
+            return best_score
+            
+    def evaluate_position(self, base_board, base_game):
+        # Fonction d'évaluation de la position (à ajuster selon votre logique)
+        # Plus le score est élevé, meilleure est la position pour le joueur actif
+        # Cette fonction pourrait utiliser différentes heuristiques pour évaluer la position
+        # Retournez un score en fonction de la position actuelle
+        return 0  # À remplacer par votre propre logique d'évaluation
+
                 
                 
         # print(biggest_number_of_flip)
         # print(best_coordinates)
         
                         
-        if len(best_coordinates) > 1:
-
-            for coordinates in best_coordinates:
-                # print(coordinates)
-                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
-                    best_coordinates_on_border = (coordinates[0],coordinates[1])
-                    # print("J'ai un coup en border")
-                    return best_coordinates_on_border
-            return random.choice(best_coordinates)
         
-        best_coordinates = (best_coordinates[0])
-        return best_coordinates          
-
 
 def play_games(number_of_games):
     white_victories = 0
@@ -472,7 +559,8 @@ def play_games(number_of_games):
         while not othello_game.is_game_over:
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                myBot.learn_and_play(othello_board, othello_game)
+                move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
+                othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
             else:
@@ -490,4 +578,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(150)
+play_games(100)
