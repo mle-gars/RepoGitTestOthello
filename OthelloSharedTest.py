@@ -281,6 +281,7 @@ class Bot:
         cpt_tile = 0
         number_of_flip = 0
         biggest_number_of_flip = -21
+        lowest_number_of_flip = 10
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
@@ -289,14 +290,14 @@ class Bot:
         new_board.create_board()
         current_part = 1
 
-        bonus_matrix_20_moins = [3, -10, 0, 0, 0, 0, -10, 3,
-                                    -10, -20, 2, 2, 2, 2, -20, -10,
-                                    0, 2, 12, 10, 10, 12, 2, 0,
-                                    0, 2, 10, 0, 0, 10, 2, 0,
-                                    0, 2, 10, 0, 0, 10, 2, 0,
-                                    0, 2, 12, 10, 10, 12, 2, 0,
-                                    -10, -20, 2, 2, 2, 2, -20, -10,
-                                    3, -10, 0, 0, 0, 0, -10, 3]
+        bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
         
       
         bonus_matrix_20_plus = [100, -10, 5, 2, 2, 5, -10, 100,
@@ -309,7 +310,7 @@ class Bot:
                                 100, -10, 5, 2, 2, 5, -10, 100]
 
   
-        if current_part <= 28:
+        if current_part <= 20:
             bonus_matrix = bonus_matrix_20_moins
             
         else:
@@ -339,11 +340,16 @@ class Bot:
                 # print("cumule")
                 # print(number_of_flip)
                 # print(biggest_number_of_flip)
-                    
+                # best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                # if best_coordinates == [(2,2)] or best_coordinates == [(3,2)] or best_coordinates == [(4,2)] or best_coordinates == [(5,2)] or best_coordinates == [(2,3)] or best_coordinates == [(5,3)] or best_coordinates == [(2,4)] or best_coordinates == [(5,4)] or best_coordinates == [(2,5)] or best_coordinates == [(3,5)] or best_coordinates == [(4,5)] or best_coordinates == [(5,5)]:
+                #     best_coordinates = best_coordinates[0]
+                #     return best_coordinates
                     
                 if number_of_flip >= biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
                     best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                    
+                    
                 # elif number_of_flip == biggest_number_of_flip:
                 #     best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
         # print(biggest_number_of_flip)
