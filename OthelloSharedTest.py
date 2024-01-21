@@ -323,8 +323,8 @@ class Bot:
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
-                check_valid.append(move_to_check)
-                # print(check_valid)
+                valid_moves.append(move_to_check)
+                # print(valid_moves)
                 
                 number_of_flip = 0
                 
@@ -344,9 +344,11 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_coordinates = best_coordinates[0]
+        best_move = self.minmax(new_board, base_game, 3, True)
+        return best_move
+        # best_coordinates = best_coordinates[0]
             
-        return best_coordinates
+        # return best_coordinates
     
     
     def get_best_move(self, board, game):
@@ -354,7 +356,7 @@ class Bot:
         return best_move    
         
     def minmax(self, board, game, depth, maximizing_player):
-        if depth == 0 or game.game_over:
+        if depth == 0:
             return self.evaluate(board)
 
         valid_moves = self.get_valid_moves(board, game.active_player)
@@ -376,7 +378,13 @@ class Bot:
                 min_eval = min(min_eval, eval)
             return min_eval
         
-
+    def get_valid_moves(self, base_board, base_game):
+        valid_moves = []
+        for tile_index in base_board.board:
+                move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
+                if move_to_check:
+                    valid_moves.append(move_to_check)
+        return valid_moves
  
         
         
