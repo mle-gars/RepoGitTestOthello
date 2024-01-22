@@ -273,37 +273,65 @@ class Game:
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
-
-    # BOT FUNCTIONS
+        
 
     def check_valid_moves(self, base_board, base_game):
         
+        cpt_tile = 0
         number_of_flip = 0
-        biggest_number_of_flip = 0
+        biggest_number_of_flip = -21
+        lowest_number_of_flip = 10
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
-        bonus_matrix = [100,-10,11,6,6,11, -10,100,
-                        -10,-20,1,2,2,1, -20,-10,
-                        10,1,5,4,4,5,1,10,
-                        6,2,4,2,2,4,2,6,
-                        6,2,4,2,2,4,2,6,
-                        10,1,5,4,4,5,1,10,
-                        -10,-20,1,2,2,1,-20,-10,
-                        100,-10,11,6,6,11,-10,100]
+        current_part = 1
+        caca = []
+
+        bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
         
+      
+        bonus_matrix_20_plus = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
+
+  
+        if current_part <= 20:
+            bonus_matrix = bonus_matrix_20_moins
+            
+        else:
+            bonus_matrix = bonus_matrix_20_plus
+            
         for tile in range(len(new_board.board)):
-            new_board.weight = bonus_matrix[tile]
+            new_board.board[tile].weight = bonus_matrix[tile]
+                
+        current_part += 2
+        
+        
         
 
+        # chibrax = self.minmax(2,base_board,base_game,True)
+        
+        # print(chibrax)
+        
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
-                check_valid.append(move_to_check)
-                print(check_valid)
+                valid_moves.append(move_to_check)
                 
                 number_of_flip = 0
                 
@@ -312,35 +340,81 @@ class Bot:
                     # print(move_to_check[move_to_check_index][0])
                     number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
 
+                # print(new_board.board[cpt_tile].weight)
+                number_of_flip += new_board.board[cpt_tile].weight
                 
-                number_of_flip += new_board.weight
-                
-                print("cumule")
-                print(number_of_flip)
+
                     
-                    
-                if number_of_flip > biggest_number_of_flip:
+                if number_of_flip >= biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
                     best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                        # print(best_coordinates)
-                elif number_of_flip == biggest_number_of_flip:
-                    best_coordinates.append((tile_index.x_pos, tile_index.y_pos)) 
-        print(biggest_number_of_flip)
-        print(best_coordinates)
-                      
-        if len(best_coordinates) > 1:
-
-            for coordinates in best_coordinates:
-                print(coordinates)
-                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
-                    best_coordinates_on_border = (coordinates[0],coordinates[1])
-                    print("J'ai un coup en border")
-                    return best_coordinates_on_border
-            return random.choice(best_coordinates)
-        
-        best_coordinates = (best_coordinates[0])
-        return best_coordinates
+                    
+                
+            cpt_tile += 1 
+            
+        best_eval, best_move = self.minmax(2, base_board, base_game, True)
+        print("Best Move:", best_move)
+        return best_move
+        # best_coordinates = best_coordinates[0]
+            
+        # return best_coordinates
     
+    
+    def minmax(self, depth, board, game, maximizing_player):
+        if depth == 0:
+            return self.evaluate_board(board, game), None
+
+        valid_moves = self.get_valid_moves(board, game)
+        best_move = None
+
+        if maximizing_player:
+            max_eval = float('-inf')
+
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
+
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
+
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+
+            return max_eval, best_move
+
+        else:
+            min_eval = float('inf')
+
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
+
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
+
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+
+            return min_eval, best_move
+
+        
+        
+        
+    def get_valid_moves(self, board100, game100):
+        valid_moves = []
+        for tile_index in board100.board:
+                move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
+                if move_to_check:
+                    valid_moves.append([tile_index.x_pos, tile_index.y_pos])
+        return valid_moves
+    
+    
+    def evaluate_board(self, board200, game200):
+        return game200.score_black - game200.score_white
+ 
+
 class OtherBot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_1.0_xX"
@@ -360,7 +434,7 @@ class OtherBot:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 check_valid.append(move_to_check)
-                print(check_valid)
+                # print(check_valid)
                 for move_to_check_index in range(len(move_to_check)):
                     number_of_flip = 0
                     number_of_flip += move_to_check[move_to_check_index][0]
@@ -368,23 +442,23 @@ class OtherBot:
                     if number_of_flip > biggest_number_of_flip:
                         biggest_number_of_flip = number_of_flip
                         best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                        print(best_coordinates)
+                        # print(best_coordinates)
                     elif number_of_flip == biggest_number_of_flip:
                         best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
                         
                 
                 
-        print(biggest_number_of_flip)
-        print(best_coordinates)
+        # print(biggest_number_of_flip)
+        # print(best_coordinates)
         
                         
         if len(best_coordinates) > 1:
 
             for coordinates in best_coordinates:
-                print(coordinates)
-                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
+                # print(coordinates)
+                if (coordinates[0] == 0 and coordinates[0] == 0) or (coordinates[0] == (len(base_board.board) - 1) and coordinates[0] == (len(base_board.board) - 1)) or (coordinates[0] == (len(base_board.board) - 1) and coordinates[0] == 0) or (coordinates[0] == 0 and coordinates[0] == (len(base_board.board) - 1)) or (coordinates[0] == 0 and coordinates[1] <= 5 and coordinates[1] >= 2) or (coordinates[1] == 0 and coordinates[0] <= 5 and coordinates[0] >= 2) or (coordinates[1] == (len(base_board.board) - 1) and coordinates[0] <= 5 and coordinates[0] >= 2) or (coordinates[0] == (len(base_board.board) - 1) and coordinates[1] <= 5 and coordinates[1] >= 2):
                     best_coordinates_on_border = (coordinates[0],coordinates[1])
-                    print("J'ai un coup en border")
+                    # print("J'ai un coup en border")
                     return best_coordinates_on_border
             return random.choice(best_coordinates)
         
@@ -436,7 +510,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(100)
-        
-        
-        
+play_games(1)
