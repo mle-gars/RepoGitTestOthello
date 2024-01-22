@@ -361,7 +361,7 @@ class Bot:
     
     
     def minmax(self, depth, board, game, maximizing_player):
-        if depth == 0:
+        if depth == 0 or game.is_game_over:
             return self.evaluate_board(board, game), None
 
         valid_moves = self.get_valid_moves(board, game)
@@ -512,4 +512,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(1)
+play_games(10)
