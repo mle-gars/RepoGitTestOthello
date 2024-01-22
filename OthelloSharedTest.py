@@ -324,14 +324,9 @@ class Bot:
         
         
 
-        caca = self.get_valid_moves(base_board, base_game)
+        # chibrax = self.minmax(2,base_board,base_game,True)
         
-        print(caca)
-        print(caca[0][0])
-        print(caca[0][1])
-        
-        chibron = self.evaluate_board(base_board,base_game)
-        print(chibron)
+        # print(chibrax)
         
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
@@ -357,28 +352,30 @@ class Bot:
                 
             cpt_tile += 1 
             
-        # best_move = self.minmax(base_board, base_game, 3, True)
-        # return best_move
-        best_coordinates = best_coordinates[0]
+        best_move = self.minmax(2,base_board, base_game, True)
+        print(best_move)
+        return best_move
+        # best_coordinates = best_coordinates[0]
             
-        return best_coordinates
+        # return best_coordinates
     
     
-    def minmax(self, depth, base_board, base_game, maximizing_player):
-        if depth == 0 or base_game.is_game_over:
-            return self.evaluate_board(base_board,base_game)
+    def minmax(self, depth, board50, game50, maximizing_player):
+        if depth == 0:
+            return self.evaluate_board(board50,game50)
         
-        valid_moves = self.get_valid_moves(base_board, base_game)
+        valid_moves = self.get_valid_moves(board50, game50)
+        best_move = []
         
         if maximizing_player:
             max_eval = float('-inf')
             
             for move in valid_moves:
-                new_board = base_board.copy()
-                new_game = copy.deepcopy(base_game)
+                temp_board = copy.deepcopy(board50)
+                temp_game = copy.deepcopy(game50)
 
-                new_game.place_pawn(move[0], move[1], new_board, base_game.active_player)
-                eval = self.minmax(depth - 1, new_board, new_game, False)
+                temp_game.place_pawn(move[0], move[1], temp_board, game50.active_player)
+                eval = self.minmax(depth - 1, temp_board, temp_game, False)
                 max_eval = max(max_eval, eval)
             return max_eval
         
@@ -387,25 +384,27 @@ class Bot:
             min_eval = float('inf')
             
             for move in valid_moves:
-                new_board = base_board.copy()
-                new_game = copy.deepcopy(base_game)
+                temp_board = copy.deepcopy(board50)
+                temp_game = copy.deepcopy(game50)
 
-                new_game.place_pawn(move[0], move[1], new_board, base_game.active_player)
-                eval = self.minmax(depth - 1, new_board, new_game, True)
+                temp_game.place_pawn(move[0], move[1], temp_board, game50.active_player)
+                eval = self.minmax(depth - 1, temp_board, temp_game, True)
                 min_eval = min(min_eval, eval)
             return min_eval
         
         
-    def get_valid_moves(self, base_board, base_game):
+        
+    def get_valid_moves(self, board100, game100):
         valid_moves = []
-        for tile_index in base_board.board:
-                move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
+        for tile_index in board100.board:
+                move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
                 if move_to_check:
                     valid_moves.append([tile_index.x_pos, tile_index.y_pos])
         return valid_moves
     
-    def evaluate_board(self, base_board, base_game):
-        return base_game.score_black - base_game.score_white
+    
+    def evaluate_board(self, board200, game200):
+        return game200.score_black - game200.score_white
  
 
 class OtherBot:
