@@ -352,7 +352,7 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_eval, best_move = self.minmax(2, base_board, base_game, True)
+        best_eval, best_move = self.minmax(3, base_board, base_game, True)
         print("Best Move:", best_move)
         return best_move
         # best_coordinates = best_coordinates[0]
@@ -411,8 +411,10 @@ class Bot:
         return valid_moves
     
     
-    def evaluate_board(self, board200, game200):
-        return game200.score_black - game200.score_white
+    def evaluate_board(self, board1000, game1000):
+        return game1000.score_black - game1000.score_white
+        
+        
  
 
 class OtherBot:
