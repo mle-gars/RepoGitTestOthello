@@ -352,45 +352,53 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_move = self.minmax(2,base_board, base_game, True)
-        print(best_move)
+        best_eval, best_move = self.minmax(2, base_board, base_game, True)
+        print("Best Move:", best_move)
         return best_move
         # best_coordinates = best_coordinates[0]
             
         # return best_coordinates
     
     
-    def minmax(self, depth, board50, game50, maximizing_player):
+    def minmax(self, depth, board, game, maximizing_player):
         if depth == 0:
-            return self.evaluate_board(board50,game50)
-        
-        valid_moves = self.get_valid_moves(board50, game50)
-        best_move = []
-        
+            return self.evaluate_board(board, game), None
+
+        valid_moves = self.get_valid_moves(board, game)
+        best_move = None
+
         if maximizing_player:
             max_eval = float('-inf')
-            
-            for move in valid_moves:
-                temp_board = copy.deepcopy(board50)
-                temp_game = copy.deepcopy(game50)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game50.active_player)
-                eval = self.minmax(depth - 1, temp_board, temp_game, False)
-                max_eval = max(max_eval, eval)
-            return max_eval
-        
-        
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
+
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
+
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+
+            return max_eval, best_move
+
         else:
             min_eval = float('inf')
-            
-            for move in valid_moves:
-                temp_board = copy.deepcopy(board50)
-                temp_game = copy.deepcopy(game50)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game50.active_player)
-                eval = self.minmax(depth - 1, temp_board, temp_game, True)
-                min_eval = min(min_eval, eval)
-            return min_eval
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
+
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
+
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+
+            return min_eval, best_move
+
         
         
         
