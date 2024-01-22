@@ -45,7 +45,10 @@
                 
                 
                 
-        for tile_index in base_board.board:
-            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
-            if move_to_check:
-                check_valid.append(move_to_check)
+        # for tile_index in base_board.board:
+        #     move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
+        #     if move_to_check:
+        #         check_valid.append(move_to_check)
+        
+        
+print(max(5,10))

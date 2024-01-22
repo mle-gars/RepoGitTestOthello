@@ -288,6 +288,7 @@ class Bot:
         new_board = Board(8)
         new_board.create_board()
         current_part = 1
+        caca = []
 
         bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
                                 -10, -20, 2, 2, 2, 2, -20, -10,
@@ -319,12 +320,23 @@ class Bot:
             new_board.board[tile].weight = bonus_matrix[tile]
                 
         current_part += 2
+        
+        
+        
 
+        caca = self.get_valid_moves(base_board, base_game)
+        
+        print(caca)
+        print(caca[0][0])
+        print(caca[0][1])
+        
+        chibron = self.evaluate_board(base_board,base_game)
+        print(chibron)
+        
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 valid_moves.append(move_to_check)
-                # print(valid_moves)
                 
                 number_of_flip = 0
                 
@@ -341,54 +353,61 @@ class Bot:
                 if number_of_flip >= biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
                     best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                    
                 
             cpt_tile += 1 
             
-        best_move = self.minmax(new_board, base_game, 3, True)
-        return best_move
-        # best_coordinates = best_coordinates[0]
+        # best_move = self.minmax(base_board, base_game, 3, True)
+        # return best_move
+        best_coordinates = best_coordinates[0]
             
-        # return best_coordinates
+        return best_coordinates
     
     
-    def get_best_move(self, board, game):
-        best_move = self.minmax(board, game, 3, True)
-        return best_move    
+    def minmax(self, depth, base_board, base_game, maximizing_player):
+        if depth == 0 or base_game.is_game_over:
+            return self.evaluate_board(base_board,base_game)
         
-    def minmax(self, board, game, depth, maximizing_player):
-        if depth == 0:
-            return self.evaluate(board)
-
-        valid_moves = self.get_valid_moves(board, game.active_player)
-
+        valid_moves = self.get_valid_moves(base_board, base_game)
+        
         if maximizing_player:
             max_eval = float('-inf')
+            
             for move in valid_moves:
-                new_board = copy.deepcopy(board)
-                self.make_move(new_board, move, game.active_player)
-                eval = self.minmax(new_board, game, depth - 1, False)
+                new_board = base_board.copy()
+                new_game = copy.deepcopy(base_game)
+
+                new_game.place_pawn(move[0], move[1], new_board, base_game.active_player)
+                eval = self.minmax(depth - 1, new_board, new_game, False)
                 max_eval = max(max_eval, eval)
             return max_eval
+        
+        
         else:
             min_eval = float('inf')
+            
             for move in valid_moves:
-                new_board = copy.deepcopy(board)
-                self.make_move(new_board, move, game.active_player)
-                eval = self.minmax(new_board, game, depth - 1, True)
+                new_board = base_board.copy()
+                new_game = copy.deepcopy(base_game)
+
+                new_game.place_pawn(move[0], move[1], new_board, base_game.active_player)
+                eval = self.minmax(depth - 1, new_board, new_game, True)
                 min_eval = min(min_eval, eval)
             return min_eval
+        
         
     def get_valid_moves(self, base_board, base_game):
         valid_moves = []
         for tile_index in base_board.board:
                 move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
                 if move_to_check:
-                    valid_moves.append(move_to_check)
+                    valid_moves.append([tile_index.x_pos, tile_index.y_pos])
         return valid_moves
+    
+    def evaluate_board(self, base_board, base_game):
+        return base_game.score_black - base_game.score_white
  
-        
-        
-        
+
 class OtherBot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_1.0_xX"
@@ -484,4 +503,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(100)
+play_games(1)
