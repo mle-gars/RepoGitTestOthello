@@ -352,7 +352,7 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_eval, best_move = self.minmax(2, base_board, base_game, float('-inf'), float('inf'), True)
+        best_eval, best_move = self.minmax(1, base_board, base_game, float('-inf'), float('inf'), True)
         print("Best Move:", best_move)
         return best_move
         # best_coordinates = best_coordinates[0]
