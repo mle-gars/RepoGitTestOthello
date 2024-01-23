@@ -1,7 +1,6 @@
 import random
 import csv
-import copy
-
+from copy import deepcopy
 # Object used to create new boards
 
 
@@ -273,37 +272,65 @@ class Game:
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
-
-    # BOT FUNCTIONS
+        
 
     def check_valid_moves(self, base_board, base_game):
         
         cpt_tile = 0
         number_of_flip = 0
         biggest_number_of_flip = -21
+        lowest_number_of_flip = 10
+        valid_moves = []
         best_coordinates = []
+        best_coordinates_on_border = []
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
-        bonus_matrix = [100,-10,11,6,6,11, -10,100,
-                        -10,-20,1,2,2,1, -20,-10,
-                        10,1,5,4,4,5,1,10,
-                        6,2,4,2,2,4,2,6,
-                        6,2,4,2,2,4,2,6,
-                        10,1,5,4,4,5,1,10,
-                        -10,-20,1,2,2,1,-20,-10,
-                        100,-10,11,6,6,11,-10,100]
+        current_part = 1
+        caca = []
+
+        bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
         
+      
+        bonus_matrix_20_plus = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
+
+  
+        if current_part <= 20:
+            bonus_matrix = bonus_matrix_20_moins
+            
+        else:
+            bonus_matrix = bonus_matrix_20_plus
+            
         for tile in range(len(new_board.board)):
             new_board.board[tile].weight = bonus_matrix[tile]
-            
+                
+        current_part += 2
+        
+        
         
 
+        # chibrax = self.minmax(2,base_board,base_game,True)
+        
+        # print(chibrax)
+        
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
-                check_valid.append(move_to_check)
-                # print(check_valid)
+                valid_moves.append(move_to_check)
                 
                 number_of_flip = 0
                 
@@ -315,105 +342,76 @@ class Bot:
                 # print(new_board.board[cpt_tile].weight)
                 number_of_flip += new_board.board[cpt_tile].weight
                 
-                # print("cumule")
-                # print(number_of_flip)
-                # print(biggest_number_of_flip)
-                    
+
                     
                 if number_of_flip >= biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
                     best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                # elif number_of_flip == biggest_number_of_flip:
-                #     best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
-        # print(biggest_number_of_flip)
-        # print(best_coordinates)
-                # print(best_coordinates)
-         
+                    
+                
             cpt_tile += 1 
             
+        best_eval, best_move = self.minmax(3, base_board, base_game, True)
+        print("Best Move:", best_move)
+        return best_move
+        # best_coordinates = best_coordinates[0]
             
-            
-        best_coordinates = best_coordinates[0]
-            
-        return best_coordinates
+        # return best_coordinates
     
-    def recursive_planning(self, base_board, base_game, depth):
-        if depth == 0:
-            # Si nous avons atteint la profondeur souhaitée, évaluez la position actuelle
-            return self.evaluate_position(base_board, base_game)
-        valid_moves = []
-        for tile_index in base_board.board:
-            move_to_check = base_board.is_legal_move(
-                tile_index.x_pos, tile_index.y_pos, base_game.active_player)
-            if move_to_check:
-                valid_moves.append((tile_index.x_pos, tile_index.y_pos))
+    
+    def minmax(self, depth, board, game, maximizing_player):
+        if depth == 0 or game.is_game_over:
+            return self.evaluate_board(board, game), None
 
-        best_score = float('-inf') if base_game.active_player == "⚫" else float('inf')
+        valid_moves = self.get_valid_moves(board, game)
         best_move = None
 
-        for move in valid_moves:
-            # Copiez l'état actuel pour simuler le coup
-            simulated_board = copy.deepcopy(base_board)
-            simulated_game = copy.deepcopy(base_game)
+        if maximizing_player:
+            max_eval = float('-inf')
 
-            # Simuler le coup
-            simulated_game.place_pawn(move[0], move[1], simulated_board, simulated_game.active_player)
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
 
-            # Récursivement appeler la planification pour le prochain niveau
-            score = self.recursive_planning(simulated_board, simulated_game, depth - 1)
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
 
-            # Mettez à jour le meilleur score et le meilleur mouvement
-            if base_game.active_player == "⚫":
-                if score > best_score:
-                    best_score = score
-                    best_move = move
-            else:
-                if score < best_score:
-                    best_score = score
+                if eval > max_eval:
+                    max_eval = eval
                     best_move = move
 
-        if depth == self.max_planning_depth:
-            # Si nous sommes au niveau supérieur, retournez le meilleur coup
-            return best_move
+            return max_eval, best_move
+
         else:
-            # Sinon, retournez le score de la position actuelle
-            return best_score
-            
-    def evaluate_position(self, base_board, base_game):
-        corner_bonus = 20
-        edge_bonus = 5
-        near_edge_penalty = -5
-        mobility_bonus = 2
-        score = base_game.score_black - base_game.score_white
+            min_eval = float('inf')
 
-        for corner in [(0, 0), (0, 7), (7, 0), (7, 7)]:
-            if base_board.board[corner[0] + corner[1] * 8].content == "⚫":
-                score += corner_bonus
-            elif base_board.board[corner[0] + corner[1] * 8].content == "⚪":
-                score -= corner_bonus
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
 
-        # Bonus pour les bords
-        for edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
-            if base_board.board[edge[0] + edge[1] * 8].content == "⚫":
-                score += edge_bonus
-            elif base_board.board[edge[0] + edge[1] * 8].content == "⚪":
-                score -= edge_bonus
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
 
-        # Malus pour les cases adjacentes aux bords
-        for near_edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
-            if base_board.board[near_edge[0] + near_edge[1] * 8].content == "🟩":
-                score += near_edge_penalty
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
 
-        # Bonus pour la mobilité
-        valid_moves = 0
-        for tile_index in base_board.board:
-            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
-            if move_to_check:
-                valid_moves += 1
+            return min_eval, best_move
 
-        score += mobility_bonus * valid_moves
-
-        return score
+        
+        
+        
+    def get_valid_moves(self, board100, game100):
+        valid_moves = []
+        for tile_index in board100.board:
+                move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
+                if move_to_check:
+                    valid_moves.append([tile_index.x_pos, tile_index.y_pos])
+        return valid_moves
+    
+    
+    def evaluate_board(self, board1000, game1000):
+        return game1000.score_black - game1000.score_white
                          
         # if len(best_coordinates) > 1:
 
