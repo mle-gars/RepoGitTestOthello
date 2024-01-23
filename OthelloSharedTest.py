@@ -351,7 +351,7 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_eval, best_move = self.minmax(3, base_board, base_game, True)
+        best_eval, best_move = self.minmax(2, base_board, base_game, True)
         print("Best Move:", best_move)
         return best_move
         # best_coordinates = best_coordinates[0]
@@ -373,7 +373,7 @@ class Bot:
                 temp_board = deepcopy(board)
                 temp_game = deepcopy(game)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
                 eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
 
                 if eval > max_eval:
@@ -389,7 +389,7 @@ class Bot:
                 temp_board = deepcopy(board)
                 temp_game = deepcopy(game)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
                 eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
 
                 if eval < min_eval:
@@ -397,6 +397,7 @@ class Bot:
                     best_move = move
 
             return min_eval, best_move
+
 
         
         
@@ -410,32 +411,16 @@ class Bot:
         return valid_moves
     
     
+    
     def evaluate_board(self, board1000, game1000):
         return game1000.score_black - game1000.score_white
-                         
-        # if len(best_coordinates) > 1:
 
-        #     for coordinates in best_coordinates:
-        #         # print(coordinates)
-        #         if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(base_board.board) - 1) or coordinates[1] == (len(base_board.board) - 1):
-        #             best_coordinates_on_border = (coordinates[0],coordinates[1])
-        #             print("J'ai un coup en border")
-        #             return best_coordinates_on_border
-        #     print("1")
-        #     print(best_coordinates)
-        #     return random.choice(best_coordinates)
-        # print("2")
-        # print(best_coordinates)
-        # best_coordinates = (best_coordinates[0])
-        # return best_coordinates
     
 class OtherBot:
     def __init__(self):
-        self.name = "Xx_Bender_Destroyer_1.0_xX"
-        self.max_planning_depth = 3
+        self.name = "Xx_Bender_Destroyer_3.0_xX"
 
     # BOT FUNCTIONS
-        
 
     def check_valid_moves(self, base_board, base_game):
         
@@ -446,19 +431,38 @@ class OtherBot:
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
-        bonus_matrix = [100,-10,11,6,6,11, -10,100,
-                        -10,-20,1,2,2,1, -20,-10,
-                        10,1,5,4,4,5,1,10,
-                        6,2,4,2,2,4,2,6,
-                        6,2,4,2,2,4,2,6,
-                        10,1,5,4,4,5,1,10,
-                        -10,-20,1,2,2,1,-20,-10,
-                        100,-10,11,6,6,11,-10,100]
+        current_part = 1
+
+        bonus_matrix_20_moins = [3, -10, 0, 0, 0, 0, -10, 3,
+                                    -10, -20, 2, 2, 2, 2, -20, -10,
+                                    0, 2, 12, 10, 10, 12, 2, 0,
+                                    0, 2, 10, 0, 0, 10, 2, 0,
+                                    0, 2, 10, 0, 0, 10, 2, 0,
+                                    0, 2, 12, 10, 10, 12, 2, 0,
+                                    -10, -20, 2, 2, 2, 2, -20, -10,
+                                    3, -10, 0, 0, 0, 0, -10, 3]
         
+      
+        bonus_matrix_20_plus = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
+
+  
+        if current_part <= 28:
+            bonus_matrix = bonus_matrix_20_moins
+            
+        else:
+            bonus_matrix = bonus_matrix_20_plus
+            
         for tile in range(len(new_board.board)):
             new_board.board[tile].weight = bonus_matrix[tile]
-            
-        
+                
+        current_part += 2
 
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
@@ -497,89 +501,7 @@ class OtherBot:
         best_coordinates = best_coordinates[0]
             
         return best_coordinates
-    
-    def recursive_planning(self, base_board, base_game, depth):
-        if depth == 0:
-            # Si nous avons atteint la profondeur souhaitée, évaluez la position actuelle
-            return self.evaluate_position(base_board, base_game)
-        valid_moves = []
-        for tile_index in base_board.board:
-            move_to_check = base_board.is_legal_move(
-                tile_index.x_pos, tile_index.y_pos, base_game.active_player)
-            if move_to_check:
-                valid_moves.append((tile_index.x_pos, tile_index.y_pos))
 
-        best_score = float('-inf') if base_game.active_player == "⚫" else float('inf')
-        best_move = None
-
-        for move in valid_moves:
-            # Copiez l'état actuel pour simuler le coup
-            simulated_board = deepcopy(base_board)
-            simulated_game = deepcopy(base_game)
-
-            # Simuler le coup
-            simulated_game.place_pawn(move[0], move[1], simulated_board, simulated_game.active_player)
-
-            # Récursivement appeler la planification pour le prochain niveau
-            score = self.recursive_planning(simulated_board, simulated_game, depth - 1)
-
-            # Mettez à jour le meilleur score et le meilleur mouvement
-            if base_game.active_player == "⚫":
-                if score > best_score:
-                    best_score = score
-                    best_move = move
-            else:
-                if score < best_score:
-                    best_score = score
-                    best_move = move
-
-        if depth == self.max_planning_depth:
-            # Si nous sommes au niveau supérieur, retournez le meilleur coup
-            return best_move
-        else:
-            # Sinon, retournez le score de la position actuelle
-            return best_score
-            
-    def evaluate_position(self, base_board, base_game):
-        corner_bonus = 20
-        edge_bonus = 5
-        near_edge_penalty = -5
-        mobility_bonus = 2
-        score = base_game.score_black - base_game.score_white
-
-        for corner in [(0, 0), (0, 7), (7, 0), (7, 7)]:
-            if base_board.board[corner[0] + corner[1] * 8].content == "⚫":
-                score += corner_bonus
-            elif base_board.board[corner[0] + corner[1] * 8].content == "⚪":
-                score -= corner_bonus
-
-        # Bonus pour les bords
-        for edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
-            if base_board.board[edge[0] + edge[1] * 8].content == "⚫":
-                score += edge_bonus
-            elif base_board.board[edge[0] + edge[1] * 8].content == "⚪":
-                score -= edge_bonus
-
-        # Malus pour les cases adjacentes aux bords
-        for near_edge in [(0, i) for i in range(1, 7)] + [(i, 0) for i in range(1, 7)] + [(7, i) for i in range(1, 7)] + [(i, 7) for i in range(1, 7)]:
-            if base_board.board[near_edge[0] + near_edge[1] * 8].content == "🟩":
-                score += near_edge_penalty
-
-        # Bonus pour la mobilité
-        valid_moves = 0
-        for tile_index in base_board.board:
-            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
-            if move_to_check:
-                valid_moves += 1
-
-        score += mobility_bonus * valid_moves
-
-        return score
-
-                
-                
-        # print(biggest_number_of_flip)
-        # print(best_coordinates)
         
                         
         
@@ -628,4 +550,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(100)
+play_games(10)
