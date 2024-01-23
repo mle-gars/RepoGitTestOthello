@@ -1,5 +1,4 @@
 import random
-import csv
 from copy import deepcopy
 import time
 
@@ -439,7 +438,7 @@ def play_games(number_of_games):
                 othello_game.is_game_over = True
                 print("Player " + othello_game.active_player + " caused a Timeout")
                 break
-            
+
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
                 move_coordinates = croto_bot.check_valid_moves(othello_board, othello_game)
