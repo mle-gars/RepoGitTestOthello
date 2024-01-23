@@ -1,6 +1,6 @@
 import random
 import csv
-import copy
+from copy import deepcopy
 
 # Object used to create new boards
 
@@ -352,7 +352,7 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_eval, best_move = self.minmax(3, base_board, base_game, True)
+        best_eval, best_move = self.minmax(2, base_board, base_game, True)
         print("Best Move:", best_move)
         return best_move
         # best_coordinates = best_coordinates[0]
@@ -361,7 +361,7 @@ class Bot:
     
     
     def minmax(self, depth, board, game, maximizing_player):
-        if depth == 0:
+        if depth == 0 or game.is_game_over:
             return self.evaluate_board(board, game), None
 
         valid_moves = self.get_valid_moves(board, game)
@@ -371,10 +371,10 @@ class Bot:
             max_eval = float('-inf')
 
             for move in valid_moves:
-                temp_board = copy.deepcopy(board)
-                temp_game = copy.deepcopy(game)
+                temp_board = deepcopy(board)
+                temp_game = deepcopy(game)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
                 eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
 
                 if eval > max_eval:
@@ -387,10 +387,10 @@ class Bot:
             min_eval = float('inf')
 
             for move in valid_moves:
-                temp_board = copy.deepcopy(board)
-                temp_game = copy.deepcopy(game)
+                temp_board = deepcopy(board)
+                temp_game = deepcopy(game)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
                 eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
 
                 if eval < min_eval:
@@ -510,4 +510,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(5)
+play_games(100)
