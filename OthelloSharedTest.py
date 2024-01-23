@@ -411,6 +411,8 @@ class OtherBot:
 def play_games(number_of_games):
     white_victories = 0
     black_victories = 0
+    white_win_icons = ""
+    black_win_icons = ""
     
     for current_game in range(number_of_games):
         # Create a new board & a new game instances
@@ -442,9 +444,14 @@ def play_games(number_of_games):
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
     
         if(othello_game.winner == "⚫"):
+            black_win_icons += "⚫"
             black_victories += 1
         elif(othello_game.winner == "⚪"):
+            white_win_icons += "⚪"
             white_victories += 1
+        
+        print(black_win_icons)
+        print(white_win_icons)
         
     
     print("End of the games, showing scores: ")
