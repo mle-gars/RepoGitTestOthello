@@ -275,7 +275,7 @@ class Bot:
         self.name = "Xx_Bender_Destroyer_3.0_xX"
         
 
-    def check_valid_moves(self, base_board, base_game):
+    def check_valid_moves(self, base_board, base_game, depth):
         
         cpt_tile = 0
         number_of_flip = 0
@@ -288,7 +288,7 @@ class Bot:
         new_board = Board(8)
         new_board.create_board()
         current_part = 1
-        caca = []
+
 
         bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
                                 -10, -20, 2, 2, 2, 2, -20, -10,
@@ -345,74 +345,90 @@ class Bot:
                 
 
                     
-                if number_of_flip >= biggest_number_of_flip:
+                if number_of_flip > biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
-                    best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
+                    best_coordinates = [[tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip]]
+                elif number_of_flip == biggest_number_of_flip:
+                    best_coordinates.append([tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip])
+
                     
                 
             cpt_tile += 1 
-            
-        best_eval, best_move = self.minmax(3, base_board, base_game, True)
-        print("Best Move:", best_move)
+        
+        if depth > 0:
+            depth -= 1
+
+            for best_coordinates_index in best_coordinates:
+                temp_board = copy.deepcopy(base_board)
+                temp_game = copy.deepcopy(base_game)
+
+                temp_game.place_pawn(best_coordinates_index[0], best_coordinates_index[1], temp_board, temp_game.active_player)
+                if base_game.is_game_over:
+                    break
+                best_move = self.check_valid_moves(temp_board, temp_game, depth)
+
+                best_coordinates_index[2] -= best_move[2]
+
+          
         return best_move
         # best_coordinates = best_coordinates[0]
             
         # return best_coordinates
     
     
-    def minmax(self, depth, board, game, maximizing_player):
-        if depth == 0 or game.is_game_over:
-            return self.evaluate_board(board, game), None
+    # def minmax(self, depth, board, game, maximizing_player):
+    #     if depth == 0 or game.is_game_over:
+    #         return self.evaluate_board(board, game), None
 
-        valid_moves = self.get_valid_moves(board, game)
-        best_move = None
+    #     valid_moves = self.get_valid_moves(board, game)
+    #     best_move = None
 
-        if maximizing_player:
-            max_eval = float('-inf')
+    #     if maximizing_player:
+    #         max_eval = float('-inf')
 
-            for move in valid_moves:
-                temp_board = copy.deepcopy(board)
-                temp_game = copy.deepcopy(game)
+    #         for move in valid_moves:
+    #             temp_board = copy.deepcopy(board)
+    #             temp_game = copy.deepcopy(game)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
-                eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
+    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
 
-                if eval > max_eval:
-                    max_eval = eval
-                    best_move = move
+    #             if eval > max_eval:
+    #                 max_eval = eval
+    #                 best_move = move
 
-            return max_eval, best_move
+    #         return max_eval, best_move
 
-        else:
-            min_eval = float('inf')
+    #     else:
+    #         min_eval = float('inf')
 
-            for move in valid_moves:
-                temp_board = copy.deepcopy(board)
-                temp_game = copy.deepcopy(game)
+    #         for move in valid_moves:
+    #             temp_board = copy.deepcopy(board)
+    #             temp_game = copy.deepcopy(game)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
-                eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
+    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
 
-                if eval < min_eval:
-                    min_eval = eval
-                    best_move = move
+    #             if eval < min_eval:
+    #                 min_eval = eval
+    #                 best_move = move
 
-            return min_eval, best_move
+    #         return min_eval, best_move
 
         
         
         
-    def get_valid_moves(self, board100, game100):
-        valid_moves = []
-        for tile_index in board100.board:
-                move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
-                if move_to_check:
-                    valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-        return valid_moves
+    # def get_valid_moves(self, board100, game100):
+    #     valid_moves = []
+    #     for tile_index in board100.board:
+    #             move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
+    #             if move_to_check:
+    #                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
+    #     return valid_moves
     
     
-    def evaluate_board(self, board1000, game1000):
-        return game1000.score_black - game1000.score_white
+    # def evaluate_board(self, board1000, game1000):
+    #     return game1000.score_black - game1000.score_white
         
         
  
@@ -493,7 +509,7 @@ def play_games(number_of_games):
         while not othello_game.is_game_over:
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
+                move_coordinates = myBot.check_valid_moves(othello_board, othello_game, 1)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
