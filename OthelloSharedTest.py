@@ -365,12 +365,15 @@ class Bot:
                 temp_game.place_pawn(best_coordinates_index[0], best_coordinates_index[1], temp_board, temp_game.active_player)
                 if base_game.is_game_over:
                     break
-                best_move = self.check_valid_moves(temp_board, temp_game, depth)
+                opponent_points = self.check_valid_moves(temp_board, temp_game, depth)
 
-                best_coordinates_index[2] -= best_move[2]
+                best_coordinates_index[2] -= opponent_points[2]
+                print(best_coordinates_index[2])
+                print
+            list.sort[best_coordinates_index[2]]
 
-          
-        return best_move
+        return best_coordinates[-1]
+    
         # best_coordinates = best_coordinates[0]
             
         # return best_coordinates
