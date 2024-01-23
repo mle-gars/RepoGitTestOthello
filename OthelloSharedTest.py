@@ -273,31 +273,28 @@ class Game:
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
-        
+
+    # BOT FUNCTIONS
 
     def check_valid_moves(self, base_board, base_game):
         
         cpt_tile = 0
         number_of_flip = 0
         biggest_number_of_flip = -21
-        lowest_number_of_flip = 10
-        valid_moves = []
         best_coordinates = []
-        best_coordinates_on_border = []
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
         current_part = 1
-        caca = []
 
-        bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
-                                -10, -20, 2, 2, 2, 2, -20, -10,
-                                5, 2, 12, 10, 10, 12, 2, 5,
-                                2, 2, 10, 0, 0, 10, 2, 2,
-                                2, 2, 10, 0, 0, 10, 2, 2,
-                                5, 2, 12, 10, 10, 12, 2, 5,
-                                -10, -20, 2, 2, 2, 2, -20, -10,
-                                100, -10, 5, 2, 2, 5, -10, 100]
+        bonus_matrix_20_moins = [3, -10, 0, 0, 0, 0, -10, 3,
+                                    -10, -20, 2, 2, 2, 2, -20, -10,
+                                    0, 2, 12, 10, 10, 12, 2, 0,
+                                    0, 2, 10, 0, 0, 10, 2, 0,
+                                    0, 2, 10, 0, 0, 10, 2, 0,
+                                    0, 2, 12, 10, 10, 12, 2, 0,
+                                    -10, -20, 2, 2, 2, 2, -20, -10,
+                                    3, -10, 0, 0, 0, 0, -10, 3]
         
       
         bonus_matrix_20_plus = [100, -10, 5, 2, 2, 5, -10, 100,
@@ -310,7 +307,7 @@ class Bot:
                                 100, -10, 5, 2, 2, 5, -10, 100]
 
   
-        if current_part <= 20:
+        if current_part <= 28:
             bonus_matrix = bonus_matrix_20_moins
             
         else:
@@ -320,18 +317,12 @@ class Bot:
             new_board.board[tile].weight = bonus_matrix[tile]
                 
         current_part += 2
-        
-        
-        
 
-        # chibrax = self.minmax(2,base_board,base_game,True)
-        
-        # print(chibrax)
-        
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
-                valid_moves.append(move_to_check)
+                check_valid.append(move_to_check)
+                # print(check_valid)
                 
                 number_of_flip = 0
                 
@@ -343,90 +334,27 @@ class Bot:
                 # print(new_board.board[cpt_tile].weight)
                 number_of_flip += new_board.board[cpt_tile].weight
                 
-
+                # print("cumule")
+                # print(number_of_flip)
+                # print(biggest_number_of_flip)
+                    
                     
                 if number_of_flip >= biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
                     best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                    
-                
+                # elif number_of_flip == biggest_number_of_flip:
+                #     best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
+        # print(biggest_number_of_flip)
+        # print(best_coordinates)
+                # print(best_coordinates)
+         
             cpt_tile += 1 
             
-        best_eval, best_move = self.minmax(1, base_board, base_game, float('-inf'), float('inf'), True)
-        print("Best Move:", best_move)
-        return best_move
-        # best_coordinates = best_coordinates[0]
             
-        # return best_coordinates
-    
-    
-    def minmax(self, depth, board, game, alpha, beta, maximizing_player):
-        if depth == 0 or game.is_game_over:
-            return self.evaluate_board(board, game), None
-
-        valid_moves = self.get_valid_moves(board, game)
-        best_move = None
-
-        for move in valid_moves:
-            temp_board = deepcopy(board)
-            temp_game = deepcopy(game)
-
-            temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
-            eval, _ = self.nega_scout(depth - 1, temp_board, temp_game, alpha, beta, not maximizing_player)
-
-            if eval > alpha:
-                alpha = eval
-                best_move = move
-
-            if alpha >= beta:
-                break
-
-        return alpha, best_move
-
-    def nega_scout(self, depth, board, game, alpha, beta, maximizing_player):
-        if depth == 0 or game.is_game_over:
-            return self.evaluate_board(board, game), None
-
-        valid_moves = self.get_valid_moves(board, game)
-        best_move = None
-        first = True
-
-        for move in valid_moves:
-            temp_board = deepcopy(board)
-            temp_game = deepcopy(game)
-
-            temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
-            eval, _ = self.nega_scout(depth - 1, temp_board, temp_game, -beta, -alpha, not maximizing_player)
-            eval = -eval  # Reverse the value for the maximizing player
-
-            if eval > alpha:
-                alpha = eval
-                best_move = move
-
-            if alpha >= beta:
-                break
-
-            if first:
-                first = False
-            else:
-                alpha = max(alpha, eval)
-
-        return alpha, best_move
-
-        
-        
-        
-    def get_valid_moves(self, board100, game100):
-        valid_moves = []
-        for tile_index in board100.board:
-                move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
-                if move_to_check:
-                    valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-        return valid_moves
-    
-    
-    def evaluate_board(self, board200, game200):
-        return game200.score_black - game200.score_white
+            
+        best_coordinates = best_coordinates[0]
+            
+        return best_coordinates
  
 
 class OtherBot:
