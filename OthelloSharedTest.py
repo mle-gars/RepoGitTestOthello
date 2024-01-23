@@ -352,7 +352,7 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_eval, best_move = self.minmax(2, base_board, base_game, True)
+        best_eval, best_move = self.minmax(2, base_board, base_game, float('-inf'), float('inf'), True)
         print("Best Move:", best_move)
         return best_move
         # best_coordinates = best_coordinates[0]
@@ -360,44 +360,58 @@ class Bot:
         # return best_coordinates
     
     
-    def minmax(self, depth, board, game, maximizing_player):
+    def minmax(self, depth, board, game, alpha, beta, maximizing_player):
         if depth == 0 or game.is_game_over:
             return self.evaluate_board(board, game), None
 
         valid_moves = self.get_valid_moves(board, game)
         best_move = None
 
-        if maximizing_player:
-            max_eval = float('-inf')
+        for move in valid_moves:
+            temp_board = deepcopy(board)
+            temp_game = deepcopy(game)
 
-            for move in valid_moves:
-                temp_board = deepcopy(board)
-                temp_game = deepcopy(game)
+            temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
+            eval, _ = self.nega_scout(depth - 1, temp_board, temp_game, alpha, beta, not maximizing_player)
 
-                temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
-                eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
+            if eval > alpha:
+                alpha = eval
+                best_move = move
 
-                if eval > max_eval:
-                    max_eval = eval
-                    best_move = move
+            if alpha >= beta:
+                break
 
-            return max_eval, best_move
+        return alpha, best_move
 
-        else:
-            min_eval = float('inf')
+    def nega_scout(self, depth, board, game, alpha, beta, maximizing_player):
+        if depth == 0 or game.is_game_over:
+            return self.evaluate_board(board, game), None
 
-            for move in valid_moves:
-                temp_board = deepcopy(board)
-                temp_game = deepcopy(game)
+        valid_moves = self.get_valid_moves(board, game)
+        best_move = None
+        first = True
 
-                temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
-                eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
+        for move in valid_moves:
+            temp_board = deepcopy(board)
+            temp_game = deepcopy(game)
 
-                if eval < min_eval:
-                    min_eval = eval
-                    best_move = move
+            temp_game.place_pawn(move[0], move[1], temp_board, temp_game.active_player)
+            eval, _ = self.nega_scout(depth - 1, temp_board, temp_game, -beta, -alpha, not maximizing_player)
+            eval = -eval  # Reverse the value for the maximizing player
 
-            return min_eval, best_move
+            if eval > alpha:
+                alpha = eval
+                best_move = move
+
+            if alpha >= beta:
+                break
+
+            if first:
+                first = False
+            else:
+                alpha = max(alpha, eval)
+
+        return alpha, best_move
 
         
         
