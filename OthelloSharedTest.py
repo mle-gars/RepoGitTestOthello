@@ -370,8 +370,8 @@ class Bot:
             max_eval = float('-inf')
 
             for move in valid_moves:
-                temp_board = copy.deepcopy(board)
-                temp_game = copy.deepcopy(game)
+                temp_board = deepcopy(board)
+                temp_game = deepcopy(game)
 
                 temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
                 eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
@@ -386,8 +386,8 @@ class Bot:
             min_eval = float('inf')
 
             for move in valid_moves:
-                temp_board = copy.deepcopy(board)
-                temp_game = copy.deepcopy(game)
+                temp_board = deepcopy(board)
+                temp_game = deepcopy(game)
 
                 temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
                 eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
@@ -514,8 +514,8 @@ class OtherBot:
 
         for move in valid_moves:
             # Copiez l'état actuel pour simuler le coup
-            simulated_board = copy.deepcopy(base_board)
-            simulated_game = copy.deepcopy(base_game)
+            simulated_board = deepcopy(base_board)
+            simulated_game = deepcopy(base_game)
 
             # Simuler le coup
             simulated_game.place_pawn(move[0], move[1], simulated_board, simulated_game.active_player)
