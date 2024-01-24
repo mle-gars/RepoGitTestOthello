@@ -1,6 +1,6 @@
 import random
-import csv
-import copy
+import numpy as np
+from copy import deepcopy
 
 # Object used to create new boards
 
@@ -273,21 +273,57 @@ class Game:
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
+        self.Q_table = dict()  # Using a dictionary to store Q values
+
+    def get_state(self, base_board, base_game):
+        # Construct a representation of the current state
+        state_representation = {
+            "board": base_board.board,  # Update this based on your needs
+            "active_player": base_game.active_player,
+            # Add more relevant information as needed
+        }
+        return str(state_representation)  # Convert to string for dictionary key
+
+    def choose_action(self, state):
+        epsilon = 0.2  # Experiment with different values
+
+        if np.random.rand() < epsilon:
+            # Exploration: Choose a random action
+            return np.random.choice(1)  # Placeholder, adjust based on available actions
+        else:
+            # Exploitation: Choose the action with the highest Q-value
+            return np.argmax(self.Q_table.get(state, np.zeros(1)))
+
+    def update_Q_value(self, state, action, reward, next_state):
+        learning_rate = 0.01  # Experiment with different values
+        discount_factor = 0.8  # Experiment with different values
+
+        # Convert states to strings for dictionary keys
+        state_str = str(state)
+        next_state_str = str(next_state)
+
+        # Bellman equation for Q-learning
+        best_next_action = np.argmax(self.Q_table.get(next_state_str, np.zeros(1)))
+        current_q_value = self.Q_table.get(state_str, np.zeros(1))[action]
+        self.Q_table[state_str] = self.Q_table.get(state_str, np.zeros(1))
+        self.Q_table[state_str][action] = current_q_value + learning_rate * (
+            reward + discount_factor * self.Q_table.get(next_state_str, np.zeros(1))[best_next_action] - current_q_value
+        )
 
     def check_valid_moves(self, base_board, base_game, depth):
         cpt_tile = 0
         number_of_flip = 0
         biggest_number_of_flip = -21
-        lowest_number_of_flip = 10
         valid_moves = []
         best_coordinates = []
+        new_board = deepcopy(base_board)
+        new_game = deepcopy(base_game)
         best_coordinates_on_border = []
         check_valid = []
         new_board = Board(8)
         new_board.create_board()
         current_part = 1
         best_move = []
-        
 
         bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
                                 -10, -20, 2, 2, 2, 2, -20, -10,
@@ -309,7 +345,6 @@ class Bot:
 
         if current_part <= 20:
             bonus_matrix = bonus_matrix_20_moins
-
         else:
             bonus_matrix = bonus_matrix_20_plus
 
@@ -318,12 +353,21 @@ class Bot:
 
         current_part += 2
 
+        state = self.get_state(new_board, new_game)
+        action = self.choose_action(state)
+
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
                 valid_moves.append(move_to_check)
 
                 number_of_flip = 0
+
+                bot_corners = sum(tile.piece == "⚫" for tile in base_board.board if tile.is_corner)
+                opponent_corners = sum(tile.piece == "⚪" for tile in base_board.board if tile.is_corner)
+                reward = bot_corners - opponent_corners
+                next_state = self.get_state(new_board, new_game)
+                self.update_Q_value(state, action, reward, next_state)
 
                 for move_to_check_index in range(len(move_to_check)):
                     number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
@@ -343,8 +387,8 @@ class Bot:
             # Check if best_coordinates is not empty before trying to access its elements
             if best_coordinates:
                 for best_coordinates_index in best_coordinates:
-                    temp_board = copy.deepcopy(base_board)
-                    temp_game = copy.deepcopy(base_game)
+                    temp_board = deepcopy(base_board)
+                    temp_game = deepcopy(base_game)
 
                     temp_game.place_pawn(best_coordinates_index[0], best_coordinates_index[1], temp_board, temp_game.active_player)
                     if base_game.is_game_over:
@@ -447,7 +491,7 @@ def play_games(number_of_games):
         while not othello_game.is_game_over:
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = myBot.check_valid_moves(othello_board, othello_game, 1)
+                move_coordinates = myBot.check_valid_moves(othello_board, othello_game, 2)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
@@ -466,4 +510,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(10)
+play_games(100)
