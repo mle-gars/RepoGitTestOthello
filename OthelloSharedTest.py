@@ -338,7 +338,7 @@ class Bot:
 
                 # print(new_board.board[cpt_tile].weight)
                 number_of_flip += new_board.board[cpt_tile].weight
-                
+                print(number_of_flip)
 
                     
                 if number_of_flip > biggest_number_of_flip:
@@ -346,6 +346,8 @@ class Bot:
                     best_coordinates = [[tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip]]
                 elif number_of_flip == biggest_number_of_flip:
                     best_coordinates.append([tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip])
+                print(biggest_number_of_flip)
+                print(best_coordinates)
 
             
                 
