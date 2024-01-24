@@ -1,4 +1,5 @@
 import random
+import json
 import numpy as np
 from copy import deepcopy
 
@@ -270,45 +271,53 @@ class Game:
         else:
             print("Égalité !")
 
+import json
+import numpy as np
+from copy import deepcopy
+
 class Bot:
     def __init__(self):
+        self.is_corner = [[0, 0], [7, 0], [0, 7], [7, 7]]
         self.name = "Xx_Bender_Destroyer_3.0_xX"
-        self.Q_table = dict()  # Using a dictionary to store Q values
+        self.Q_table = dict()
+        self.best_moves = []
 
     def get_state(self, base_board, base_game):
-        # Construct a representation of the current state
         state_representation = {
-            "board": base_board.board,  # Update this based on your needs
+            "board": base_board.board,
             "active_player": base_game.active_player,
-            # Add more relevant information as needed
         }
-        return str(state_representation)  # Convert to string for dictionary key
+        return str(state_representation)
 
     def choose_action(self, state):
-        epsilon = 0.2  # Experiment with different values
+        epsilon = 0.1
 
         if np.random.rand() < epsilon:
-            # Exploration: Choose a random action
-            return np.random.choice(1)  # Placeholder, adjust based on available actions
+            return np.random.choice(1)
         else:
-            # Exploitation: Choose the action with the highest Q-value
             return np.argmax(self.Q_table.get(state, np.zeros(1)))
 
     def update_Q_value(self, state, action, reward, next_state):
-        learning_rate = 0.01  # Experiment with different values
-        discount_factor = 0.8  # Experiment with different values
+        learning_rate = 0.02
+        discount_factor = 0.95
 
-        # Convert states to strings for dictionary keys
         state_str = str(state)
         next_state_str = str(next_state)
 
-        # Bellman equation for Q-learning
         best_next_action = np.argmax(self.Q_table.get(next_state_str, np.zeros(1)))
         current_q_value = self.Q_table.get(state_str, np.zeros(1))[action]
         self.Q_table[state_str] = self.Q_table.get(state_str, np.zeros(1))
         self.Q_table[state_str][action] = current_q_value + learning_rate * (
             reward + discount_factor * self.Q_table.get(next_state_str, np.zeros(1))[best_next_action] - current_q_value
         )
+
+    def store_best_moves(self, moves):
+        # Store the best moves in the best_moves list
+        self.best_moves.extend(moves)
+
+    def save_best_moves(self, filename="best_moves.json"):
+        with open(filename, "w") as json_file:
+            json.dump(self.best_moves, json_file, indent=2)
 
     def check_valid_moves(self, base_board, base_game, depth):
         cpt_tile = 0
@@ -325,8 +334,8 @@ class Bot:
         current_part = 1
         best_move = []
 
-        bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
-                                -10, -20, 2, 2, 2, 2, -20, -10,
+        bonus_matrix_20_moins = [100, -15, 5, 2, 2, 5, -10, 100,
+                                -15, -20, 2, 2, 2, 2, -20, -10,
                                 5, 2, 12, 10, 10, 12, 2, 5,
                                 2, 2, 10, 0, 0, 10, 2, 2,
                                 2, 2, 10, 0, 0, 10, 2, 2,
@@ -334,8 +343,8 @@ class Bot:
                                 -10, -20, 2, 2, 2, 2, -20, -10,
                                 100, -10, 5, 2, 2, 5, -10, 100]
 
-        bonus_matrix_20_plus = [100, -10, 5, 2, 2, 5, -10, 100,
-                                -10, -20, 2, 2, 2, 2, -20, -10,
+        bonus_matrix_20_plus = [100, -15, 5, 2, 2, 5, -15, 100,
+                                -15, -20, 2, 2, 2, 2, -20, -15,
                                 5, 2, 12, 10, 10, 12, 2, 5,
                                 2, 2, 10, 0, 0, 10, 2, 2,
                                 2, 2, 10, 0, 0, 10, 2, 2,
@@ -356,6 +365,10 @@ class Bot:
         state = self.get_state(new_board, new_game)
         action = self.choose_action(state)
 
+        if base_game.winner == "⚫":
+            # Store the best moves when Black wins
+            self.store_best_moves(best_coordinates)
+
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
@@ -363,9 +376,7 @@ class Bot:
 
                 number_of_flip = 0
 
-                bot_corners = sum(tile.piece == "⚫" for tile in base_board.board if tile.is_corner)
-                opponent_corners = sum(tile.piece == "⚪" for tile in base_board.board if tile.is_corner)
-                reward = bot_corners - opponent_corners
+                reward = 1 if base_game.winner == "⚫" else -0.3
                 next_state = self.get_state(new_board, new_game)
                 self.update_Q_value(state, action, reward, next_state)
 
@@ -412,8 +423,6 @@ class Bot:
             return (0, 0)
        
 
-        
- 
 
 class OtherBot:
     def __init__(self):
@@ -508,6 +517,8 @@ def play_games(number_of_games):
     print("End of the games, showing scores: ")
     print("Black player won " + str(black_victories) + " times")
     print("White player won " + str(white_victories) + " times")
+
         
 
 play_games(100)
+
