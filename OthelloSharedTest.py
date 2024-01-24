@@ -55,20 +55,6 @@ class Board:
         self.board[35].content = "⚫"
         self.board[36].content = "⚪"
         
-        # self.board[11].content = "⚫"
-        # self.board[9].content = "⚪"
-        # self.board[10].content = "⚪"
-        # self.board[11].content = "⚪"
-        
-        # self.board[10].content = "⚫"
-        # self.board[18].content = "⚪"
-        # self.board[19].content = "⚪"
-        # self.board[26].content = "⚪"
-        # self.board[35].content = "⚪"
-        # self.board[36].content = "⚪"
-        # self.board[37].content = "⚫"
-        
-
     # Check if the position in inside the board
     # Return true or false depending if it is inside or not
     def is_on_board(self, x_pos, y_pos):
@@ -367,65 +353,7 @@ class Bot:
 
         best_coordinates = best_coordinates[0]
         return best_coordinates
-    
-    
-    
-    # def minmax(self, depth, board, game, maximizing_player):
-    #     if depth == 0 or game.is_game_over:
-    #         return self.evaluate_board(board, game), None
-
-    #     valid_moves = self.get_valid_moves(board, game)
-    #     best_move = None
-
-    #     if maximizing_player:
-    #         max_eval = float('-inf')
-
-    #         for move in valid_moves:
-    #             temp_board = copy.deepcopy(board)
-    #             temp_game = copy.deepcopy(game)
-
-    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
-    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
-
-    #             if eval > max_eval:
-    #                 max_eval = eval
-    #                 best_move = move
-
-    #         return max_eval, best_move
-
-    #     else:
-    #         min_eval = float('inf')
-
-    #         for move in valid_moves:
-    #             temp_board = copy.deepcopy(board)
-    #             temp_game = copy.deepcopy(game)
-
-    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
-    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
-
-    #             if eval < min_eval:
-    #                 min_eval = eval
-    #                 best_move = move
-
-    #         return min_eval, best_move
-
         
-        
-        
-    # def get_valid_moves(self, board100, game100):
-    #     valid_moves = []
-    #     for tile_index in board100.board:
-    #             move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
-    #             if move_to_check:
-    #                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-    #     return valid_moves
-    
-    
-    # def evaluate_board(self, board1000, game1000):
-    #     return game1000.score_black - game1000.score_white
-        
-        
- 
 
 class CrotoBotEz:
     def __init__(self):
