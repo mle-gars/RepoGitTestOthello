@@ -321,7 +321,7 @@ class Bot:
         for tile in range(len(new_board.board)):
             new_board.board[tile].weight = bonus_matrix[tile]
                 
-        current_part += 2
+        current_part += 1
         
         
         
@@ -337,11 +337,19 @@ class Bot:
                 
                 if (tile_index.x_pos, tile_index.y_pos) in [(0, 0), (0, 7), (7, 0), (7, 7)]:
                     return (tile_index.x_pos, tile_index.y_pos)
-                        
+                
+                # if current_part <= 10:
+                #     if (tile_index.x_pos, tile_index.y_pos) in [(2, 3), (2, 4), (3, 2), (4, 2),(5, 3), (5, 4), (3, 5), (4, 5)]:
+                #         return (tile_index.x_pos, tile_index.y_pos)
+                
+                # if (tile_index.x_pos, tile_index.y_pos) in [(6, 7), (7,7), (7, 6), (5, 7),(6,6),(7,5),(4,7),(5,6),(6,5),(7,4)]:
+                #     return (tile_index.x_pos, tile_index.y_pos)
+                    
                 if (tile_index.x_pos, tile_index.y_pos) in [(2, 0), (3, 0), (4, 0), (5, 0), (0, 2), (0, 3),
                                                             (0, 4), (0, 5), (7, 2), (7, 3), (7, 4), (7, 5), (2, 7),
                                                             (3, 7), (4, 7), (5, 7)]:
                     return (tile_index.x_pos, tile_index.y_pos)
+                
                 
                 number_of_flip = 0
                 
@@ -353,7 +361,10 @@ class Bot:
                 # print(new_board.board[cpt_tile].weight)
                 number_of_flip += new_board.board[cpt_tile].weight
                 
-
+                if current_part <= 6:
+                    if number_of_flip < 2 and number_of_flip > 0:
+                        return (tile_index.x_pos, tile_index.y_pos)
+                        
                     
                 if number_of_flip > biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
