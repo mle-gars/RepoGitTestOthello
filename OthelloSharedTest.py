@@ -1,5 +1,7 @@
 import random
 import csv
+import copy
+import time
 
 # Object used to create new boards
 
@@ -58,12 +60,13 @@ class Board:
         # self.board[10].content = "⚪"
         # self.board[11].content = "⚪"
         
-        # self.board[12].content = "⚫"
+        # self.board[10].content = "⚫"
+        # self.board[18].content = "⚪"
         # self.board[19].content = "⚪"
-        # self.board[20].content = "⚪"
-        # self.board[28].content = "⚪"
+        # self.board[26].content = "⚪"
+        # self.board[35].content = "⚪"
         # self.board[36].content = "⚪"
-        # self.board[26].content = "⚫"
+        # self.board[37].content = "⚫"
         
 
     # Check if the position in inside the board
@@ -271,89 +274,278 @@ class Game:
 class Bot:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
+        
 
-    # BOT FUNCTIONS
-
-    def check_valid_moves(self, Board, Game):
-
+    def check_valid_moves(self, base_board, base_game):
+        
+        cpt_tile = 0
         number_of_flip = 0
-        biggest_number_of_flip = 0
+        biggest_number_of_flip = -21
+        lowest_number_of_flip = 10
         valid_moves = []
         best_coordinates = []
         best_coordinates_on_border = []
         check_valid = []
+        new_board = Board(8)
+        new_board.create_board()
+        current_part = 1
+        best_move = []
 
-        for tile_index in Board.board:
-            move_to_check = Board.is_legal_move(tile_index.x_pos, tile_index.y_pos, Game.active_player)
+
+        bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 20, 15, 15, 20, 2, 5,
+                                2, 2, 15, 0, 0, 15, 2, 2,
+                                2, 2, 15, 0, 0, 15, 2, 2,
+                                5, 2, 20, 15, 15, 20, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
+        
+      
+        bonus_matrix_20_plus = [100, -20, 5, 2, 2, 5, -20, 100,
+                                -20, -30, 2, 2, 2, 2, -30, -20,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -20, -30, 2, 2, 2, 2, -30, -20,
+                                100, -20, 5, 2, 2, 5, -20, 100]
+
+  
+        if current_part <= 16:
+            bonus_matrix = bonus_matrix_20_moins
+            
+        else:
+            bonus_matrix = bonus_matrix_20_plus
+            
+        for tile in range(len(new_board.board)):
+            new_board.board[tile].weight = bonus_matrix[tile]
+                
+        current_part += 1
+        
+        
+        
+
+        # chibrax = self.minmax(2,base_board,base_game,True)
+        
+        # print(chibrax)
+        
+        for tile_index in base_board.board:
+            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
             if move_to_check:
-                check_valid.append(move_to_check)
-                print(check_valid)
-                for move_to_check_index in range(len(move_to_check)):
-                    number_of_flip = 0
-                    number_of_flip += move_to_check[move_to_check_index][0]
+                valid_moves.append(move_to_check)
+                
+                if (tile_index.x_pos, tile_index.y_pos) in [(0, 0), (0, 7), (7, 0), (7, 7)]:
+                    return (tile_index.x_pos, tile_index.y_pos)
+                
+                
+                # if current_part <= 10:
+                #     if (tile_index.x_pos, tile_index.y_pos) in [(2, 3), (2, 4), (3, 2), (4, 2),(5, 3), (5, 4), (3, 5), (4, 5)]:
+                #         return (tile_index.x_pos, tile_index.y_pos)
+                
+                # if (tile_index.x_pos, tile_index.y_pos) in [(6, 7), (7,7), (7, 6), (5, 7),(6,6),(7,5),(4,7),(5,6),(6,5),(7,4)]:
+                #     return (tile_index.x_pos, tile_index.y_pos)
                     
-                    if number_of_flip > biggest_number_of_flip:
-                        biggest_number_of_flip = number_of_flip
-                        best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                        print(best_coordinates)
-                    elif number_of_flip == biggest_number_of_flip:
-                        best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
-                        
+                if (tile_index.x_pos, tile_index.y_pos) in [(2, 0), (3, 0), (4, 0), (5, 0), (0, 2), (0, 3),
+                                                            (0, 4), (0, 5), (7, 2), (7, 3), (7, 4), (7, 5), (2, 7),
+                                                            (3, 7), (4, 7), (5, 7)]:
+                    return(tile_index.x_pos, tile_index.y_pos)
                 
                 
+                number_of_flip = 0
                 
-        print(biggest_number_of_flip)
-        print(best_coordinates)
-        
+                for move_to_check_index in range(len(move_to_check)):
+                    # print("score")
+                    # print(move_to_check[move_to_check_index][0])
+                    number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
+
+                # print(new_board.board[cpt_tile].weight)
+                number_of_flip += new_board.board[cpt_tile].weight
+                
+                if current_part <= 6:
+                    if number_of_flip < 2 and number_of_flip > 0:
+                        return (tile_index.x_pos, tile_index.y_pos)
                         
-                        
-        if len(best_coordinates) > 1:
+                    
+                if number_of_flip > biggest_number_of_flip:
+                    biggest_number_of_flip = number_of_flip
+                    best_coordinates = [[tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip]]
+                elif number_of_flip == biggest_number_of_flip:
+                    best_coordinates.append([tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip])
 
-            for coordinates in best_coordinates:
-                print(coordinates)
-                if coordinates[0] == 0 or coordinates[1] == 0 or coordinates[0] == (len(Board.board) - 1) or coordinates[1] == (len(Board.board) - 1):
-                    best_coordinates_on_border = (coordinates[0],coordinates[1])
-                    print("J'ai un coup en border")
-                    return best_coordinates_on_border
-            return random.choice(best_coordinates)
-        
-        best_coordinates = (best_coordinates[0])
-        return best_coordinates          
-     
-        
-        
-        
-        
-# Create a new board & a new game instances
-othello_board = Board(8)
-othello_game = Game()
+            
+                
+            cpt_tile += 1 
 
-# Fill the board with tiles
-othello_board.create_board()
+        best_coordinates = random.choices(best_coordinates)
+        best_coordinates = best_coordinates[0]
+        return best_coordinates
+    
+    
+    
+    # def minmax(self, depth, board, game, maximizing_player):
+    #     if depth == 0 or game.is_game_over:
+    #         return self.evaluate_board(board, game), None
 
-# Draw the board
-othello_board.draw_board("Content")
+    #     valid_moves = self.get_valid_moves(board, game)
+    #     best_move = None
 
-# Create 2 bots
-myBot = Bot()
-otherBot = Bot()
+    #     if maximizing_player:
+    #         max_eval = float('-inf')
 
-# Loop until the game is over
+    #         for move in valid_moves:
+    #             temp_board = copy.deepcopy(board)
+    #             temp_game = copy.deepcopy(game)
 
+    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
 
-while not othello_game.is_game_over:
-    # First player / bot logic goes here
-    if (othello_game.active_player == "⚫"):
-        move_coordinates = [0, 0]
-        move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
-        othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
+    #             if eval > max_eval:
+    #                 max_eval = eval
+    #                 best_move = move
 
-    # Second player / bot logic goes here
-    else:
-        move_coordinates = [0, 0]
-        move_coordinates[0] = int(input("Coordonnées en X: "))
-        move_coordinates[1] = int(input("Coordonnées en Y: "))
-        othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
+    #         return max_eval, best_move
+
+    #     else:
+    #         min_eval = float('inf')
+
+    #         for move in valid_moves:
+    #             temp_board = copy.deepcopy(board)
+    #             temp_game = copy.deepcopy(game)
+
+    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
+
+    #             if eval < min_eval:
+    #                 min_eval = eval
+    #                 best_move = move
+
+    #         return min_eval, best_move
+
         
         
         
+    # def get_valid_moves(self, board100, game100):
+    #     valid_moves = []
+    #     for tile_index in board100.board:
+    #             move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
+    #             if move_to_check:
+    #                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
+    #     return valid_moves
+    
+    
+    # def evaluate_board(self, board1000, game1000):
+    #     return game1000.score_black - game1000.score_white
+        
+        
+ 
+
+class CrotoBotEz:
+    def __init__(self):
+        self.coners = [[0, 0], [7, 0], [0, 7], [7, 7]]
+        self.avoided_tiles = [[1, 0], [0, 1],  [1, 1], [1, 7], [0, 6], [1, 6], [6, 0], [7, 1], [6, 1], [6, 7], [7, 6], [6, 6]]
+
+    # BOT FUNCTIONS
+
+    def check_valid_moves(self, board, game):
+        max_points = -999
+        best_moves = []
+        current_move = []
+
+        for current_tile in board.board:
+            points = 0
+
+            if(board.is_tile_empty):
+                current_move = board.is_legal_move(current_tile.x_pos, current_tile.y_pos, game.active_player)
+                
+                if (current_move != False):
+                    for tiles_to_flip in current_move:
+                        points += tiles_to_flip[0]
+                    
+                    points += self.get_tile_weight(current_tile.x_pos, current_tile.y_pos)
+                    if(points > max_points):
+                        best_moves = [[current_tile.x_pos, current_tile.y_pos]]
+                        max_points = points
+                    elif(points == max_points):
+                        best_moves.append([current_tile.x_pos, current_tile.y_pos])
+
+        return random.choice(best_moves)
+                
+    def get_tile_weight(self, x, y):
+        total_points = 0
+
+        for current_coord in self.coners:
+            if x == current_coord[0] and y == current_coord[1]:
+                total_points += 100
+                break
+            
+        for current_coord in self.avoided_tiles:
+            if x == current_coord[0] and y == current_coord[1]:
+                total_points -= 30
+                break
+        
+        return total_points 
+
+
+def play_games(number_of_games):
+    white_victories = 0
+    black_victories = 0
+    white_win_icons = ""
+    black_win_icons = ""
+    
+    for current_game in range(number_of_games):
+
+        timeout = time.time() + 0.6
+
+        # Create a new board & a new game instances
+        othello_board = Board(8)
+        othello_game = Game()
+
+        # Fill the board with tiles
+        othello_board.create_board()
+
+        # Draw the board
+        othello_board.draw_board("Content")
+
+        # Create 2 bots
+        myBot = Bot()
+        croto_bot = CrotoBotEz()
+
+        # Loop until the game is over
+
+
+        while not othello_game.is_game_over:
+
+            if(time.time() > timeout):
+                othello_game.check_for_winner()
+                othello_game.is_game_over = True
+                print("Player " + othello_game.active_player + " caused a Timeout")
+                break
+
+            # First player / bot logic goes here
+            if (othello_game.active_player == "⚫"):
+                move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
+                othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
+
+            # Second player / bot logic goes here
+            else:
+                move_coordinates = croto_bot.check_valid_moves(othello_board, othello_game)
+                othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
+    
+        if(othello_game.winner == "⚫"):
+            black_win_icons += "⚫"
+            black_victories += 1
+        elif(othello_game.winner == "⚪"):
+            white_win_icons += "⚪"
+            white_victories += 1
+        
+        print(black_win_icons)
+        print(white_win_icons)
+        
+    
+    print("End of the games, showing scores: ")
+    print("Black player won " + str(black_victories) + " times")
+    print("White player won " + str(white_victories) + " times")
+        
+
+play_games(100)
