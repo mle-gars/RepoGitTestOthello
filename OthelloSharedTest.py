@@ -352,7 +352,7 @@ class Bot:
                 
             cpt_tile += 1 
             
-        best_eval, best_move = self.minmax(3, base_board, base_game, True)
+        best_eval, best_move = self.minmax(2, base_board, base_game, True)
         print("Best Move:", best_move)
         return best_move
         # best_coordinates = best_coordinates[0]
@@ -417,55 +417,51 @@ class Bot:
         
  
 
-class OtherBot:
+class CrotoBotEz:
     def __init__(self):
-        self.name = "Xx_Bender_Destroyer_1.0_xX"
+        self.coners = [[0, 0], [7, 0], [0, 7], [7, 7]]
+        self.avoided_tiles = [[1, 0], [0, 1],  [1, 1], [1, 7], [0, 6], [1, 6], [6, 0], [7, 1], [6, 1], [6, 7], [7, 6], [6, 6]]
 
     # BOT FUNCTIONS
 
-    def check_valid_moves(self, base_board, base_game):
+    def check_valid_moves(self, board, game):
+        max_points = -999
+        best_moves = []
+        current_move = []
 
-        number_of_flip = 0
-        biggest_number_of_flip = 0
-        valid_moves = []
-        best_coordinates = []
-        best_coordinates_on_border = []
-        check_valid = []
+        for current_tile in board.board:
+            points = 0
 
-        for tile_index in base_board.board:
-            move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
-            if move_to_check:
-                check_valid.append(move_to_check)
-                # print(check_valid)
-                for move_to_check_index in range(len(move_to_check)):
-                    number_of_flip = 0
-                    number_of_flip += move_to_check[move_to_check_index][0]
+            if(board.is_tile_empty):
+                current_move = board.is_legal_move(current_tile.x_pos, current_tile.y_pos, game.active_player)
+                
+                if (current_move != False):
+                    for tiles_to_flip in current_move:
+                        points += tiles_to_flip[0]
                     
-                    if number_of_flip > biggest_number_of_flip:
-                        biggest_number_of_flip = number_of_flip
-                        best_coordinates = [(tile_index.x_pos, tile_index.y_pos)]
-                        # print(best_coordinates)
-                    elif number_of_flip == biggest_number_of_flip:
-                        best_coordinates.append((tile_index.x_pos, tile_index.y_pos))
-                        
-                
-                
-        # print(biggest_number_of_flip)
-        # print(best_coordinates)
-        
-                        
-        if len(best_coordinates) > 1:
+                    points += self.get_tile_weight(current_tile.x_pos, current_tile.y_pos)
+                    if(points > max_points):
+                        best_moves = [[current_tile.x_pos, current_tile.y_pos]]
+                        max_points = points
+                    elif(points == max_points):
+                        best_moves.append([current_tile.x_pos, current_tile.y_pos])
 
-            for coordinates in best_coordinates:
-                # print(coordinates)
-                if (coordinates[0] == 0 and coordinates[0] == 0) or (coordinates[0] == (len(base_board.board) - 1) and coordinates[0] == (len(base_board.board) - 1)) or (coordinates[0] == (len(base_board.board) - 1) and coordinates[0] == 0) or (coordinates[0] == 0 and coordinates[0] == (len(base_board.board) - 1)) or (coordinates[0] == 0 and coordinates[1] <= 5 and coordinates[1] >= 2) or (coordinates[1] == 0 and coordinates[0] <= 5 and coordinates[0] >= 2) or (coordinates[1] == (len(base_board.board) - 1) and coordinates[0] <= 5 and coordinates[0] >= 2) or (coordinates[0] == (len(base_board.board) - 1) and coordinates[1] <= 5 and coordinates[1] >= 2):
-                    best_coordinates_on_border = (coordinates[0],coordinates[1])
-                    # print("J'ai un coup en border")
-                    return best_coordinates_on_border
-            return random.choice(best_coordinates)
+        return random.choice(best_moves)
+                
+    def get_tile_weight(self, x, y):
+        total_points = 0
+
+        for current_coord in self.coners:
+            if x == current_coord[0] and y == current_coord[1]:
+                total_points += 100
+                break
+            
+        for current_coord in self.avoided_tiles:
+            if x == current_coord[0] and y == current_coord[1]:
+                total_points -= 30
+                break
         
-        best_coordinates = (best_coordinates[0])
-        return best_coordinates          
+        return total_points 
 
 
 def play_games(number_of_games):
@@ -485,7 +481,7 @@ def play_games(number_of_games):
 
         # Create 2 bots
         myBot = Bot()
-        otherBot = OtherBot()
+        otherBot = CrotoBotEz()
 
         # Loop until the game is over
 
@@ -512,4 +508,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(1)
+play_games(100)
