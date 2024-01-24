@@ -368,11 +368,13 @@ class Bot:
                 opponent_points = self.check_valid_moves(temp_board, temp_game, depth)
 
                 best_coordinates_index[2] -= opponent_points[2]
-                print(best_coordinates_index[2])
-                print
-            list.sort[best_coordinates_index[2]]
 
-        return best_coordinates[-1]
+                best_move.append(best_coordinates_index)
+                print(best_move)
+
+            best_move = sorted(best_move, key=lambda x: x[2], reverse=True)
+
+        return best_move[0][:2]
     
         # best_coordinates = best_coordinates[0]
             
