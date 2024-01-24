@@ -288,6 +288,7 @@ class Bot:
         new_board = Board(8)
         new_board.create_board()
         current_part = 1
+        best_move = []
 
 
         bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
@@ -350,29 +351,42 @@ class Bot:
                     best_coordinates = [[tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip]]
                 elif number_of_flip == biggest_number_of_flip:
                     best_coordinates.append([tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip])
-
+                
                     
                 
             cpt_tile += 1 
         
-        if depth > 0:
+        if depth >= 0:
             depth -= 1
+            # Check if best_coordinates is not empty before trying to access its elements
+            if best_coordinates:
+                for best_coordinates_index in best_coordinates:
+                    print(best_coordinates)
+                    temp_board = copy.deepcopy(base_board)
+                    temp_game = copy.deepcopy(base_game)
 
-            for best_coordinates_index in best_coordinates:
-                temp_board = copy.deepcopy(base_board)
-                temp_game = copy.deepcopy(base_game)
+                    temp_game.place_pawn(best_coordinates_index[0], best_coordinates_index[1], temp_board, temp_game.active_player)
+                    if base_game.is_game_over:
+                        break
+                    print(depth)
+                    opponent_points = self.check_valid_moves(temp_board, temp_game, depth)
+                
+                    # Check if opponent_points is not empty and has at least 3 elements before accessing its elements
+                    print('best coor')
+                    print(best_coordinates_index)
+                    print('best oppo')
+                    print(opponent_points)
+                    if opponent_points:
+                        best_coordinates_index[2] -= opponent_points[2]
+                           
 
-                temp_game.place_pawn(best_coordinates_index[0], best_coordinates_index[1], temp_board, temp_game.active_player)
-                if base_game.is_game_over:
-                    break
-                opponent_points = self.check_valid_moves(temp_board, temp_game, depth)
+                    best_move.append(best_coordinates_index)
+                    print(best_move)
 
-                best_coordinates_index[2] -= opponent_points[2]
-                print(best_coordinates_index[2])
-                print
-            list.sort[best_coordinates_index[2]]
-
-        return best_coordinates[-1]
+                best_move = sorted(best_move, key=lambda x: x[2], reverse=True)
+                print(best_move)
+        
+        return best_move
     
         # best_coordinates = best_coordinates[0]
             
