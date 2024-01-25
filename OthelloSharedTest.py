@@ -2,6 +2,7 @@ import random
 import csv
 import copy
 import time
+from copy import deepcopy
 
 # Object used to create new boards
 
@@ -369,108 +370,225 @@ class Xx_Bender_Destroyer_30_xX :
     
     
     
-    # def minmax(self, depth, board, game, maximizing_player):
-    #     if depth == 0 or game.is_game_over:
-    #         return self.evaluate_board(board, game), None
+    def minmax(self, depth, board, game, maximizing_player):
+        if depth == 0 or game.is_game_over:
+            return self.evaluate_board(board, game), None
 
-    #     valid_moves = self.get_valid_moves(board, game)
-    #     best_move = None
+        valid_moves = self.get_valid_moves(board, game)
+        best_move = None
 
-    #     if maximizing_player:
-    #         max_eval = float('-inf')
+        if maximizing_player:
+            max_eval = float('-inf')
 
-    #         for move in valid_moves:
-    #             temp_board = copy.deepcopy(board)
-    #             temp_game = copy.deepcopy(game)
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
 
-    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
-    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, False)
 
-    #             if eval > max_eval:
-    #                 max_eval = eval
-    #                 best_move = move
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
 
-    #         return max_eval, best_move
+            return max_eval, best_move
 
-    #     else:
-    #         min_eval = float('inf')
+        else:
+            min_eval = float('inf')
 
-    #         for move in valid_moves:
-    #             temp_board = copy.deepcopy(board)
-    #             temp_game = copy.deepcopy(game)
+            for move in valid_moves:
+                temp_board = copy.deepcopy(board)
+                temp_game = copy.deepcopy(game)
 
-    #             temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
-    #             eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
+                temp_game.place_pawn(move[0], move[1], temp_board, game.active_player)
+                eval, _ = self.minmax(depth - 1, temp_board, temp_game, True)
 
-    #             if eval < min_eval:
-    #                 min_eval = eval
-    #                 best_move = move
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
 
-    #         return min_eval, best_move
+            return min_eval, best_move
 
         
         
         
-    # def get_valid_moves(self, board100, game100):
-    #     valid_moves = []
-    #     for tile_index in board100.board:
-    #             move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
-    #             if move_to_check:
-    #                 valid_moves.append([tile_index.x_pos, tile_index.y_pos])
-    #     return valid_moves
+    def get_valid_moves(self, board100, game100):
+        valid_moves = []
+        for tile_index in board100.board:
+                move_to_check = board100.is_legal_move(tile_index.x_pos, tile_index.y_pos, game100.active_player)
+                if move_to_check:
+                    valid_moves.append([tile_index.x_pos, tile_index.y_pos])
+        return valid_moves
     
     
-    # def evaluate_board(self, board1000, game1000):
-    #     return game1000.score_black - game1000.score_white
+    def evaluate_board(self, board1000, game1000):
+        return game1000.score_black - game1000.score_white
         
         
  
 
-class CrotoBotEz:
+class Babaaa:
+   
     def __init__(self):
-        self.coners = [[0, 0], [7, 0], [0, 7], [7, 7]]
-        self.avoided_tiles = [[1, 0], [0, 1],  [1, 1], [1, 7], [0, 6], [1, 6], [6, 0], [7, 1], [6, 1], [6, 7], [7, 6], [6, 6]]
+        self.name = "Babaaaaa"
 
-    # BOT FUNCTIONS
 
-    def check_valid_moves(self, board, game):
-        max_points = -999
-        best_moves = []
-        current_move = []
+    def check_valid_moves_test(self, board, game,depth):
+        matrice_list = [
+            100, -25,  50,  50,  50,  50, -25, 100,
+            -25, -50, -15, -15, -15, -15, -50, -25,
+             50, -15,  10,  10,  10,  10, -15,  50,
+             50, -15,  10, 'X', 'X',  10, -15,  50,
+             50, -15,  10, 'X', 'X',  10, -15,  50,
+             50, -15,  10,  10,  10,  10, -15,  50,
+            -25, -50, -15, -15, -15, -15, -50, -25,
+            100, -25,  50,  50,  50,  50, -25,  100
+        ]
+        newboard = deepcopy(board)
+        matrice_list = self.initialize_matrix(newboard,matrice_list, game.active_player)
+        max_points = -10000
+        playable_moves = []
+        final_max_point = 0
+        points_per_move = []
+        final_playable_moves = []
+        turn = game.score_black + game.score_white - 4
+        for index in range(len(board.board)):
+            square_info = board.is_legal_move(board.board[index].x_pos, board.board[index].y_pos, game.active_player)
+            if square_info != False:
+                points_per_case = 0
+                #ajout du poids en fonction de la case
+                weight = newboard.board[index].content
+                #On calcule le nombre de points en fonctions de la position et de la direction
+                #square_direction /points_per_case /
+                for square_direction in range(len(square_info)):
+                    if(turn < 20):
+                        points_per_case -= square_info[square_direction][0]
+                    else:
+                        points_per_case += square_info[square_direction][0]
 
-        for current_tile in board.board:
-            points = 0
 
-            if(board.is_tile_empty):
-                current_move = board.is_legal_move(current_tile.x_pos, current_tile.y_pos, game.active_player)
-                
-                if (current_move != False):
-                    for tiles_to_flip in current_move:
-                        points += tiles_to_flip[0]
-                    
-                    points += self.get_tile_weight(current_tile.x_pos, current_tile.y_pos)
-                    if(points > max_points):
-                        best_moves = [[current_tile.x_pos, current_tile.y_pos]]
-                        max_points = points
-                    elif(points == max_points):
-                        best_moves.append([current_tile.x_pos, current_tile.y_pos])
+                points_per_case += weight
+                #On récupère le coup qui rapporte le maximum de points
+                if max_points == points_per_case:
+                    playable_moves.append([board.board[index].x_pos, board.board[index].y_pos,max_points])
+                elif max_points < points_per_case:
+                    max_points  = points_per_case
+                    playable_moves = [[board.board[index].x_pos, board.board[index].y_pos,max_points]]
+       
+       
+        if depth > 0:
+            depth -=1
+            playable_moves = self.best_moves(playable_moves, board, game, depth)
+            # 2 list for the points / final moves
+            # Get the points value and store them
+            for move in playable_moves:
+                points_per_move.append(move[2])
+            # Check for the maximum value
+            final_max_point = max(points_per_move)
+            # Only fill the final list with the highest score moves
+            for move in playable_moves:
+                if(move[2] == final_max_point):
+                    final_playable_moves.append(move)
+            return random.choice(final_playable_moves)
+        return random.choice(playable_moves)
+   
+    def best_moves(self,playable_moves, board, game, depth):
+        for index in playable_moves:
+            # Init copy board / game
+            new_board = deepcopy(board)
+            new_game = deepcopy(game)
+            # Place pawn, recursive call for check_valid_moves
+            #print(index)
+            new_game.place_pawn(index[0], index[1], new_board, new_game.active_player)
+            if new_game.is_game_over == False:
+                opponent_points = self.check_valid_moves_test(new_board, new_game, depth)
+            # Tile score update
+                index.append(index[2]-opponent_points[2])
+                index.pop(2)
+        return playable_moves
 
-        return random.choice(best_moves)
-                
-    def get_tile_weight(self, x, y):
-        total_points = 0
 
-        for current_coord in self.coners:
-            if x == current_coord[0] and y == current_coord[1]:
-                total_points += 100
-                break
-            
-        for current_coord in self.avoided_tiles:
-            if x == current_coord[0] and y == current_coord[1]:
-                total_points -= 30
-                break
-        
-        return total_points 
+    # function allow to initialize a bord with a matrix
+    def initialize_matrix(self,table,matrice_list,color):
+        if color == table.board[0].content :
+            matrice_list[1] = 75
+            matrice_list[8] = 75
+        if color == table.board[7].content :
+            matrice_list[6] = 75
+            matrice_list[15] = 75
+        if color == table.board[56].content :
+            matrice_list[48] = 75
+            matrice_list[57] = 75
+        if color == table.board[63].content :
+            matrice_list[55] = 75
+            matrice_list[62] = 75
+       
+        if color == table.board[1].content:
+            step = 1
+            while matrice_list[step] != 100 and matrice_list[step+1]<len(matrice_list):
+                if matrice_list[step] == 75 and color == table.board[step].content:
+                    matrice_list[step+1] = 75
+                step +=1
+       
+        if color == table.board[57].content:
+            step = 57
+            while matrice_list[step] != 100 and matrice_list[step+1]<len(matrice_list):
+                if matrice_list[step] == 75 and color == table.board[step].content:
+                    matrice_list[step+1] = 75
+                step +=1
+       
+        #Pas de 8
+               
+        if color == table.board[8].content:
+            step = 8
+            while matrice_list[step+8] != 100 and matrice_list[step+1]<len(matrice_list):
+                if matrice_list[step] == 75 and color == table.board[step].content:
+                    matrice_list[step+8] = 75
+                step +=8
+       
+        if color == table.board[15].content:
+            step = 15
+            while matrice_list[step+8] != 100 and matrice_list[step+1]<len(matrice_list):
+                if matrice_list[step] == 75 and color == table.board[step].content:
+                    matrice_list[step+8] = 75
+                step +=8
+
+
+        #Pas de -1
+               
+        if color == table.board[6].content:
+            step = 6
+            while matrice_list[step] != 100 and matrice_list[step+1]>0:
+                if matrice_list[step] == 75 and color == table.board[step].content:
+                    if step-1 >0:
+                        matrice_list[step-1] = 75
+                step -=1
+
+
+        #Pas de -8
+               
+        if color == table.board[48].content:
+            step = 48
+            while matrice_list[step] != 100 and matrice_list[step+1]>0:
+                if matrice_list[step] == 75 and color == table.board[step].content:
+                    if step-8 >0:
+                        matrice_list[step-8] = 75
+                step -=8
+       
+        if color == table.board[55].content:
+            step = 55
+            while matrice_list[step] != 100 and matrice_list[step+1]>0:
+                if matrice_list[step] == 75 and color == table.board[step].content:
+                    if step-8 >0:
+                        matrice_list[step-8] = 75
+                step -=8
+
+
+       
+        for index in range(len(table.board)):                
+            if table.board[index].content != 'X':
+                table.board[index].content = matrice_list[index]
+        return matrice_list
 
 
 def play_games(number_of_games):
@@ -495,7 +613,7 @@ def play_games(number_of_games):
 
         # Create 2 bots
         benderBot = Xx_Bender_Destroyer_30_xX()
-        croto_bot = CrotoBotEz()
+        babaa = Babaaa()
 
         # Loop until the game is over
 
@@ -515,7 +633,7 @@ def play_games(number_of_games):
 
             # Second player / bot logic goes here
             else:
-                move_coordinates = croto_bot.check_valid_moves(othello_board, othello_game)
+                move_coordinates = babaa.check_valid_moves_test(othello_board, othello_game, 2)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
     
         if(othello_game.winner == "⚫"):
