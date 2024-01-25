@@ -55,20 +55,6 @@ class Board:
         self.board[35].content = "⚫"
         self.board[36].content = "⚪"
         
-        # self.board[11].content = "⚫"
-        # self.board[9].content = "⚪"
-        # self.board[10].content = "⚪"
-        # self.board[11].content = "⚪"
-        
-        # self.board[10].content = "⚫"
-        # self.board[18].content = "⚪"
-        # self.board[19].content = "⚪"
-        # self.board[26].content = "⚪"
-        # self.board[35].content = "⚪"
-        # self.board[36].content = "⚪"
-        # self.board[37].content = "⚫"
-        
-
     # Check if the position in inside the board
     # Return true or false depending if it is inside or not
     def is_on_board(self, x_pos, y_pos):
@@ -271,7 +257,7 @@ class Game:
         else:
             print("Égalité !")
 
-class Bot:
+class Xx_Bender_Destroyer_30_xX :
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
         
@@ -304,10 +290,10 @@ class Bot:
       
         bonus_matrix_20_plus = [100, -20, 5, 2, 2, 5, -20, 100,
                                 -20, -30, 2, 2, 2, 2, -30, -20,
-                                5, 2, 12, 10, 10, 12, 2, 5,
-                                2, 2, 10, 0, 0, 10, 2, 2,
-                                2, 2, 10, 0, 0, 10, 2, 2,
-                                5, 2, 12, 10, 10, 12, 2, 5,
+                                5, 2, 2, 1, 1, 2, 2, 5,
+                                2, 2, 1, 0, 0, 1, 2, 2,
+                                2, 2, 1, 0, 0, 1, 2, 2,
+                                5, 2, 2, 1, 1, 2, 2, 5,
                                 -20, -30, 2, 2, 2, 2, -30, -20,
                                 100, -20, 5, 2, 2, 5, -20, 100]
 
@@ -508,7 +494,7 @@ def play_games(number_of_games):
         othello_board.draw_board("Content")
 
         # Create 2 bots
-        myBot = Bot()
+        benderBot = Xx_Bender_Destroyer_30_xX()
         croto_bot = CrotoBotEz()
 
         # Loop until the game is over
@@ -524,7 +510,7 @@ def play_games(number_of_games):
 
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
+                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
@@ -548,4 +534,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(100)
+play_games(1000)
