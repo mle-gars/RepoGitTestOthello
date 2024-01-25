@@ -628,12 +628,12 @@ def play_games(number_of_games):
 
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game)
+                move_coordinates = babaa.check_valid_moves_test(othello_board, othello_game, 1)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
             else:
-                move_coordinates = babaa.check_valid_moves_test(othello_board, othello_game, 2)
+                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
     
         if(othello_game.winner == "⚫"):
@@ -652,4 +652,4 @@ def play_games(number_of_games):
     print("White player won " + str(white_victories) + " times")
         
 
-play_games(1000)
+play_games(100)
