@@ -1,12 +1,7 @@
 import random
-import csv
+from copy import deepcopy
 import copy
 import time
-# import numpy as np
-# import sklearn
-# import pytorch
-# import tensor
-
 
 # Object used to create new boards
 
@@ -276,7 +271,7 @@ class Game:
         else:
             print("Égalité !")
 
-class Bot:
+class Xx_Bender_Destroyer_30_xX:
     def __init__(self):
         self.name = "Xx_Bender_Destroyer_3.0_xX"
         
@@ -295,11 +290,11 @@ class Bot:
         new_board.create_board()
         current_part = 1
         best_move = []
-
+        score = 0
 
         bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
                                 -10, -20, 2, 2, 2, 2, -20, -10,
-                                5, 2, 1, 1, 1, 1, 2, 5,
+                                5, 2, 1, 1, 1, 12, 2, 5,
                                 2, 2, 1, 0, 0, 1, 2, 2,
                                 2, 2, 1, 0, 0, 1, 2, 2,
                                 5, 2, 2, 1, 1, 1, 2, 5,
@@ -307,14 +302,14 @@ class Bot:
                                 100, -10, 5, 2, 2, 5, -10, 100]
         
       
-        bonus_matrix_20_plus = [100, -20,  10,  5,  5,  10, -20,  100,
-                                -20, -50, -2, -2, -2, -2, -50, -20,
-                                10,  -2,  -1,  -1,  -1,  -1, -2,  10,
-                                5,  -2,  -1,  0,  0,  -1, -2,  5,
-                                5,  -2,  -1,  0,  0,  -1, -2,  5,
-                                10,  -2,  -1,  -1,  -1,  -1, -2,  10,
-                                -20, -50, -2, -2, -2, -2, -50, -20,
-                                100, -20,  10,  5,  5,  10, -20,  100]
+        bonus_matrix_20_plus = [100, -10, 5, 2, 2, 5, -10, 100,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                2, 2, 10, 0, 0, 10, 2, 2,
+                                5, 2, 12, 10, 10, 12, 2, 5,
+                                -10, -20, 2, 2, 2, 2, -20, -10,
+                                100, -10, 5, 2, 2, 5, -10, 100]
 
   
         if current_part <= 20:
@@ -361,8 +356,47 @@ class Bot:
                     
                 
             cpt_tile += 1 
-        best_coordinates = best_coordinates[0]
-        return best_coordinates
+        if base_game.is_game_over:
+            return None
+        
+        if depth >= 0:
+            
+            # Check if best_coordinates is not empty before trying to access its elements
+            if best_coordinates:
+                for best_coordinates_index in best_coordinates:
+                    # print(best_coordinates)
+                    temp_board = copy.deepcopy(base_board)
+                    temp_game = copy.deepcopy(base_game)
+
+                    temp_game.place_pawn(best_coordinates_index[0], best_coordinates_index[1], temp_board, temp_game.active_player)
+                    if base_game.is_game_over:
+                        break
+                    # print(depth)
+                    opponent_points = self.check_valid_moves(temp_board, temp_game, depth - 1)
+                
+                    # Check if opponent_points is not empty and has at least 3 elements before accessing its elements
+                    print('best coor')
+                    print(best_coordinates_index)
+                    print('best oppo')
+                    print(opponent_points)
+                    if opponent_points:
+                        
+                        best_coordinates_index[2] -= opponent_points[2]
+                        score = best_coordinates_index[2]
+                           
+                    best_move = max(best_coordinates, key=lambda x: x[2])
+                    return [best_move[0],best_move[1],score]
+        
+        
+        return best_coordinates[0]
+
+                    
+                    # print(best_move)
+
+                
+                # print(best_move)
+        
+        return best_move
     
     
     
@@ -423,51 +457,93 @@ class Bot:
         
  
 
-class CrotoBotEz:
-    def __init__(self):
-        self.coners = [[0, 0], [7, 0], [0, 7], [7, 7]]
-        self.avoided_tiles = [[1, 0], [0, 1],  [1, 1], [1, 7], [0, 6], [1, 6], [6, 0], [7, 1], [6, 1], [6, 7], [7, 6], [6, 6]]
+class Justice_league:
+    def __init__(self, name):
+        self.name = name
 
     # BOT FUNCTIONS
+    def check_valid_moves(self, board, color):
+        new_board = Board(8)
+        new_board.create_board()
+        valid_moves = []
+        max_pawns_flipped = -999
+        best_move = []
+        tile_index = 0
+        self.board_weight(new_board)
 
-    def check_valid_moves(self, board, game):
-        max_points = -999
-        best_moves = []
-        current_move = []
+        for tile in board.board:
+            x_pos, y_pos = tile.x_pos, tile.y_pos
 
-        for current_tile in board.board:
-            points = 0
-
-            if(board.is_tile_empty):
-                current_move = board.is_legal_move(current_tile.x_pos, current_tile.y_pos, game.active_player)
-                
-                if (current_move != False):
-                    for tiles_to_flip in current_move:
-                        points += tiles_to_flip[0]
+            if board.is_tile_empty(x_pos, y_pos):
+                move_result = board.is_legal_move(x_pos, y_pos, color)
+                if move_result:
+                    # Calculer le score total pour ce mouvement
+                    total_flipped = sum([result[0] for result in move_result]) + new_board.board[tile_index].weight
+                    if total_flipped > max_pawns_flipped:
+                        max_pawns_flipped = total_flipped
+                        best_move = [ [x_pos, y_pos, total_flipped]]
+                    elif total_flipped == max_pawns_flipped  :
+                        best_move.append([x_pos, y_pos, total_flipped])
+            tile_index += 1
                     
-                    points += self.get_tile_weight(current_tile.x_pos, current_tile.y_pos)
-                    if(points > max_points):
-                        best_moves = [[current_tile.x_pos, current_tile.y_pos]]
-                        max_points = points
-                    elif(points == max_points):
-                        best_moves.append([current_tile.x_pos, current_tile.y_pos])
 
-        return random.choice(best_moves)
-                
-    def get_tile_weight(self, x, y):
-        total_points = 0
+        return random.choice(best_move)
 
-        for current_coord in self.coners:
-            if x == current_coord[0] and y == current_coord[1]:
-                total_points += 100
-                break
-            
-        for current_coord in self.avoided_tiles:
-            if x == current_coord[0] and y == current_coord[1]:
-                total_points -= 30
-                break
+    def board_weight(self, new_board):
         
-        return total_points 
+        matrice_list = [100, -20, 10, 5, 5, 10, -20, 100,
+        -20, -50, -2, -2, -2, -2, -50, -20,
+        10, -2, 8, 1, 1, 8, -2, 10,
+        5, -2, 1, 2, 2, 1, -2, 5,
+        5, -2, 1, 2, 2, 1, -2, 5,
+        10, -2, 8, 1, 1, 8, -2, 10,
+        -20, -50, -2, -2, -2, -2, -50, -20,
+        100, -20, 10, 5, 5, 10, -20, 100]
+        for current_tile in range(len(new_board.board)):
+            new_board.board[current_tile].weight = matrice_list[current_tile]
+
+    def check_for_valid_moves(self, main_board, main_game, depth):
+        playable_moves = [[2, 4, 7], [6, 3, 7]]  # Exemple de mouvements possibles
+
+        if depth > 0:
+            for move in playable_moves:
+                new_board = deepcopy(main_board)
+                new_game = deepcopy(main_game)
+
+                main_game.place_pawn(move[0], move[1], new_board, new_game.active_player)
+                opponent_points = self.check_for_valid_moves(new_board, new_game, depth - 1)
+                move[2] -= opponent_points
+
+            best_move = max(playable_moves, key=lambda x: x[2])
+            return [best_move[0], best_move[1]]
+
+        return random.choice(playable_moves)
+    
+    def evaluate_move(self, board, x, y, color):
+        score = 0
+        corners = [(0, 0), (0, 7), (7, 0), (7, 7)]
+        edges = [(0, 1), (0, 6), (1, 0), (1, 7), (6, 0), (6, 7), (7, 1), (7, 6)]
+        # Score for capturing corners
+        if (x, y) in corners:
+            score += 150
+        elif (x, y) in edges:
+            score += 50 
+        # Score for mobility
+        score += 2 * self.calculate_mobility(board, color)
+        
+        # Score for flipping opponent's tiles
+        flipping_score = len(board.get_flipped_tiles(x, y, color))
+        score += flipping_score
+        
+        return score
+
+    def calculate_mobility(self, board, color):
+        mobility = 0
+        for x in range(8):
+            for y in range(8):
+                if board.is_legal_move(x, y, color):
+                    mobility += 1
+        return mobility
 
 
 def play_games(number_of_games):
@@ -491,8 +567,8 @@ def play_games(number_of_games):
         othello_board.draw_board("Content")
 
         # Create 2 bots
-        myBot = Bot()
-        croto_bot = CrotoBotEz()
+        myBot = Justice_league("yane")
+        benderBot = Xx_Bender_Destroyer_30_xX()
 
         # Loop until the game is over
 
@@ -507,12 +583,13 @@ def play_games(number_of_games):
 
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = myBot.check_valid_moves(othello_board, othello_game, 1)
+                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game,1)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
             else:
-                move_coordinates = croto_bot.check_valid_moves(othello_board, othello_game)
+                move_coordinates = myBot.check_valid_moves(
+                    othello_board, othello_game.active_player)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
     
         if(othello_game.winner == "⚫"):
