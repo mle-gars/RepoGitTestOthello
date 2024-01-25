@@ -2,6 +2,11 @@ import random
 import csv
 import copy
 import time
+# import numpy as np
+# import sklearn
+# import pytorch
+# import tensor
+
 
 # Object used to create new boards
 
@@ -276,7 +281,7 @@ class Bot:
         self.name = "Xx_Bender_Destroyer_3.0_xX"
         
 
-    def check_valid_moves(self, base_board, base_game):
+    def check_valid_moves(self, base_board, base_game, depth):
         
         cpt_tile = 0
         number_of_flip = 0
@@ -294,34 +299,34 @@ class Bot:
 
         bonus_matrix_20_moins = [100, -10, 5, 2, 2, 5, -10, 100,
                                 -10, -20, 2, 2, 2, 2, -20, -10,
-                                5, 2, 20, 15, 15, 20, 2, 5,
-                                2, 2, 15, 0, 0, 15, 2, 2,
-                                2, 2, 15, 0, 0, 15, 2, 2,
-                                5, 2, 20, 15, 15, 20, 2, 5,
+                                5, 2, 1, 1, 1, 1, 2, 5,
+                                2, 2, 1, 0, 0, 1, 2, 2,
+                                2, 2, 1, 0, 0, 1, 2, 2,
+                                5, 2, 2, 1, 1, 1, 2, 5,
                                 -10, -20, 2, 2, 2, 2, -20, -10,
                                 100, -10, 5, 2, 2, 5, -10, 100]
         
       
-        bonus_matrix_20_plus = [100, -20, 5, 2, 2, 5, -20, 100,
-                                -20, -30, 2, 2, 2, 2, -30, -20,
-                                5, 2, 12, 10, 10, 12, 2, 5,
-                                2, 2, 10, 0, 0, 10, 2, 2,
-                                2, 2, 10, 0, 0, 10, 2, 2,
-                                5, 2, 12, 10, 10, 12, 2, 5,
-                                -20, -30, 2, 2, 2, 2, -30, -20,
-                                100, -20, 5, 2, 2, 5, -20, 100]
+        bonus_matrix_20_plus = [100, -20,  10,  5,  5,  10, -20,  100,
+                                -20, -50, -2, -2, -2, -2, -50, -20,
+                                10,  -2,  -1,  -1,  -1,  -1, -2,  10,
+                                5,  -2,  -1,  0,  0,  -1, -2,  5,
+                                5,  -2,  -1,  0,  0,  -1, -2,  5,
+                                10,  -2,  -1,  -1,  -1,  -1, -2,  10,
+                                -20, -50, -2, -2, -2, -2, -50, -20,
+                                100, -20,  10,  5,  5,  10, -20,  100]
 
   
-        if current_part <= 16:
+        if current_part <= 20:
             bonus_matrix = bonus_matrix_20_moins
             
         else:
-            bonus_matrix = bonus_matrix_20_plus
+            bonus_matrix = bonus_matrix_20_moins
             
         for tile in range(len(new_board.board)):
             new_board.board[tile].weight = bonus_matrix[tile]
                 
-        current_part += 1
+        current_part += 2
         
         
         
@@ -335,23 +340,6 @@ class Bot:
             if move_to_check:
                 valid_moves.append(move_to_check)
                 
-                if (tile_index.x_pos, tile_index.y_pos) in [(0, 0), (0, 7), (7, 0), (7, 7)]:
-                    return (tile_index.x_pos, tile_index.y_pos)
-                
-                
-                # if current_part <= 10:
-                #     if (tile_index.x_pos, tile_index.y_pos) in [(2, 3), (2, 4), (3, 2), (4, 2),(5, 3), (5, 4), (3, 5), (4, 5)]:
-                #         return (tile_index.x_pos, tile_index.y_pos)
-                
-                # if (tile_index.x_pos, tile_index.y_pos) in [(6, 7), (7,7), (7, 6), (5, 7),(6,6),(7,5),(4,7),(5,6),(6,5),(7,4)]:
-                #     return (tile_index.x_pos, tile_index.y_pos)
-                    
-                if (tile_index.x_pos, tile_index.y_pos) in [(2, 0), (3, 0), (4, 0), (5, 0), (0, 2), (0, 3),
-                                                            (0, 4), (0, 5), (7, 2), (7, 3), (7, 4), (7, 5), (2, 7),
-                                                            (3, 7), (4, 7), (5, 7)]:
-                    return(tile_index.x_pos, tile_index.y_pos)
-                
-                
                 number_of_flip = 0
                 
                 for move_to_check_index in range(len(move_to_check)):
@@ -362,22 +350,17 @@ class Bot:
                 # print(new_board.board[cpt_tile].weight)
                 number_of_flip += new_board.board[cpt_tile].weight
                 
-                if current_part <= 6:
-                    if number_of_flip < 2 and number_of_flip > 0:
-                        return (tile_index.x_pos, tile_index.y_pos)
-                        
+
                     
                 if number_of_flip > biggest_number_of_flip:
                     biggest_number_of_flip = number_of_flip
                     best_coordinates = [[tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip]]
                 elif number_of_flip == biggest_number_of_flip:
                     best_coordinates.append([tile_index.x_pos, tile_index.y_pos, biggest_number_of_flip])
-
-            
+                
+                    
                 
             cpt_tile += 1 
-
-        best_coordinates = random.choices(best_coordinates)
         best_coordinates = best_coordinates[0]
         return best_coordinates
     
@@ -524,7 +507,7 @@ def play_games(number_of_games):
 
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = myBot.check_valid_moves(othello_board, othello_game)
+                move_coordinates = myBot.check_valid_moves(othello_board, othello_game, 1)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
