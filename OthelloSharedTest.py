@@ -583,13 +583,13 @@ def play_games(number_of_games):
 
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game,1)
+                move_coordinates = myBot.check_valid_moves(
+                    othello_board, othello_game.active_player)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
             else:
-                move_coordinates = myBot.check_valid_moves(
-                    othello_board, othello_game.active_player)
+                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game,3)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
     
         if(othello_game.winner == "⚫"):
