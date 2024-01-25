@@ -375,10 +375,10 @@ class Xx_Bender_Destroyer_30_xX:
                     opponent_points = self.check_valid_moves(temp_board, temp_game, depth - 1)
                 
                     # Check if opponent_points is not empty and has at least 3 elements before accessing its elements
-                    print('best coor')
-                    print(best_coordinates_index)
-                    print('best oppo')
-                    print(opponent_points)
+                    # print('best coor')
+                    # print(best_coordinates_index)
+                    # print('best oppo')
+                    # print(opponent_points)
                     if opponent_points:
                         
                         best_coordinates_index[2] -= opponent_points[2]
@@ -554,7 +554,7 @@ def play_games(number_of_games):
     
     for current_game in range(number_of_games):
 
-        timeout = time.time() + 0.6
+        timeout = time.time() + 0.8
 
         # Create a new board & a new game instances
         othello_board = Board(8)
@@ -579,17 +579,21 @@ def play_games(number_of_games):
                 othello_game.check_for_winner()
                 othello_game.is_game_over = True
                 print("Player " + othello_game.active_player + " caused a Timeout")
+                
                 break
 
             # First player / bot logic goes here
             if (othello_game.active_player == "⚫"):
-                move_coordinates = myBot.check_valid_moves(
-                    othello_board, othello_game.active_player)
+                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game,3)
+                # move_coordinates = myBot.check_valid_moves(
+                #     othello_board, othello_game.active_player)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
 
             # Second player / bot logic goes here
             else:
-                move_coordinates = benderBot.check_valid_moves(othello_board, othello_game,3)
+                # move_coordinates = benderBot.check_valid_moves(othello_board, othello_game,3)
+                move_coordinates = myBot.check_valid_moves(
+                    othello_board, othello_game.active_player)
                 othello_game.place_pawn(move_coordinates[0], move_coordinates[1], othello_board, othello_game.active_player)
     
         if(othello_game.winner == "⚫"):
