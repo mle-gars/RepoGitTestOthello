@@ -313,9 +313,6 @@ class Xx_Bender_Destroyer_30_xX :
         
         
 
-        # chibrax = self.minmax(2,base_board,base_game,True)
-        
-        # print(chibrax)
         
         for tile_index in base_board.board:
             move_to_check = base_board.is_legal_move(tile_index.x_pos, tile_index.y_pos, base_game.active_player)
@@ -326,13 +323,7 @@ class Xx_Bender_Destroyer_30_xX :
                     return (tile_index.x_pos, tile_index.y_pos)
                 
                 
-                # if current_part <= 10:
-                #     if (tile_index.x_pos, tile_index.y_pos) in [(2, 3), (2, 4), (3, 2), (4, 2),(5, 3), (5, 4), (3, 5), (4, 5)]:
-                #         return (tile_index.x_pos, tile_index.y_pos)
-                
-                # if (tile_index.x_pos, tile_index.y_pos) in [(6, 7), (7,7), (7, 6), (5, 7),(6,6),(7,5),(4,7),(5,6),(6,5),(7,4)]:
-                #     return (tile_index.x_pos, tile_index.y_pos)
-                    
+            
                 if (tile_index.x_pos, tile_index.y_pos) in [(2, 0), (3, 0), (4, 0), (5, 0), (0, 2), (0, 3),
                                                             (0, 4), (0, 5), (7, 2), (7, 3), (7, 4), (7, 5), (2, 7),
                                                             (3, 7), (4, 7), (5, 7)]:
@@ -342,11 +333,9 @@ class Xx_Bender_Destroyer_30_xX :
                 number_of_flip = 0
                 
                 for move_to_check_index in range(len(move_to_check)):
-                    # print("score")
-                    # print(move_to_check[move_to_check_index][0])
+                    
                     number_of_flip = number_of_flip + move_to_check[move_to_check_index][0]
 
-                # print(new_board.board[cpt_tile].weight)
                 number_of_flip += new_board.board[cpt_tile].weight
                 
                 if current_part <= 6:
@@ -427,10 +416,10 @@ class Xx_Bender_Destroyer_30_xX :
         
  
 
-class Babaaa:
+class concurent:
    
     def __init__(self):
-        self.name = "Babaaaaa"
+        self.name = "concurent"
 
 
     def check_valid_moves_test(self, board, game,depth):
@@ -613,7 +602,7 @@ def play_games(number_of_games):
 
         # Create 2 bots
         benderBot = Xx_Bender_Destroyer_30_xX()
-        babaa = Babaaa()
+        babaa = concurent()
 
         # Loop until the game is over
 

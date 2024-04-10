@@ -1,7 +1,6 @@
 import random
 import csv
 import json
-import 
 
 class Xx_Bender_Destroyer_30_xX :
     def __init__(self):
